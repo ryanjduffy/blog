@@ -14,6 +14,7 @@ description: >
 baseurl: "/blog" # the subpath of your site, e.g. /blog
 url: "ryanjduffy.github.io" # the base hostname & protocol for your site
 github_username:  ryanjduffy
+codepen_username: ryanjduffy
 
 # Build settings
 markdown: redcarpet

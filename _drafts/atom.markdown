@@ -1,6 +1,0 @@
----
-title: Atom
-layout: post
----
-
-

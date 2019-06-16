@@ -9,9 +9,18 @@
 
 .history-entry {
 	border: 1px solid #ccc;
-	border-radius: 3px;
+	border-bottom-width: 0px;
 	padding: 10px 10px 10px 60px;
 	font-size: 0.8em;
+}
+
+.history-entry:first-of-type {
+	border-radius: 3px 3px 0px 0px;
+}
+
+.history-entry:last-of-type {
+	border-radius: 0px 0px 3px 3px;
+	border-bottom-width: 1px;
 }
 
 .history-entry IMG {
@@ -69,7 +78,7 @@
 							'<a href="' + url + '" target="gh-history">' + message + '</a>' +
 							'<span>' + author + ' updated this ' + date.toLocaleString() + '</span>' + 
 						'</div>';
-			});
+			}).join('');
 
 			post_history.innerHTML += html;
 			post_history.style.display = 'block';

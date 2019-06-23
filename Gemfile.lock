@@ -29,6 +29,7 @@ GEM
       safe_yaml (~> 1.0)
     jekyll-compose (0.8.0)
       jekyll (~> 3.0)
+    jekyll-paginate (1.1.0)
     jekyll-sass-converter (1.5.2)
       sass (~> 3.4)
     jekyll-watch (2.1.2)
@@ -60,6 +61,7 @@ PLATFORMS
 
 DEPENDENCIES
   jekyll-compose
+  jekyll-paginate
 
 BUNDLED WITH
    1.17.1

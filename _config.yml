@@ -17,6 +17,7 @@ github_username:  ryanjduffy
 twitter_username: theryanjduffy
 codepen_username: ryanjduffy
 paginate: 10
+excerpt_separator: <!--more-->
 
 # Build settings
 plugins: 

@@ -8,6 +8,8 @@ date: 2012-11-14 20:44 -0700
 
 <p>The view state framework is a relatively simple but extensible mechanism to manage the state of view controls. The definition of view control is loose but is intended to represent any control on which a user might expect to be able to "go back" to a previous state. The framework is not a view controller in MVC fashion but can be adapted to that purpose. I've done just that by extending the enyo.Panels control.
 
+<!--more-->
+
 </p><p>The view state framework has 3 components: enyo.ViewState, an implementation of ViewStateStrategy, and the consumer control.
 
 </p><p>ViewState is the consumer API for the framework and consists of a single property, path, and two events, onSaveState and onRestoreState. Each instance of ViewState must declare a unique path (in the traditional /path/to/me format) but all paths need not be at the same depth. The intent is that you could have a view (path:"/home") that contains additional views (path:"/home/items") and their paths would represent that heirarchy. In addition to the semantic value, this also allows the framework to persist and restore states of any parent paths of the saved path. So, if you tell ViewState to save the state of /home/items, it will also trigger a save of /home via the onSaveState. Similarly, if the state of /home/items is restored, the state of /home is also restored (via onRestoreState).

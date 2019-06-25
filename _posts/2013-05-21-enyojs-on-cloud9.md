@@ -8,6 +8,8 @@ date: 2013-05-21 20:39 -0700
 <p><b>TL; DR</b></p>
 <p>Pull in bootplate, update the submodules, and "disconnect" the master branch from the bootplate repo.</p>
 
+<!--more-->
+
 <pre><code>git clone https://github.com/enyojs/bootplate.git; rm -rf .git; shopt -s dotglob; mv bootplate/* .; git remote rename origin bootplate; git submodule update --init; printf "\n.c9*" &gt;&gt; .gitignore; git add .gitignore; git config --unset branch.master.remote; git config --unset branch.master.merge;</code></pre>
 
 <p>Assuming your pushing this to a new git repo (on <a href="http://github.com">Github</a> or <a href="http://bitbucket.org">Bitbucket</a> for example), add the remote repo and set the master branch to track it.</p>

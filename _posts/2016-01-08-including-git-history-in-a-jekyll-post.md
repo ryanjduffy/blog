@@ -10,6 +10,8 @@ published: True
 Now that I've bought into a Jekyll-based blog running on GitHub Pages, the next step was to surface
 the revision history for a post at the bottom so readers can easily see when and what was updated.
 
+<!--more-->
+
 ## Retrieving the History
 
 I had a couple thoughts on how I might get the git history onto the post. My first instinct was to

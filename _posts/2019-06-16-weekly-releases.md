@@ -7,6 +7,8 @@ tags: [Product Management]
 
 We've recently got back into the habit of weekly releases in preparation for a 3.0.0 release of [Enact](https://www.enactjs.com/) and it has reminded how useful they are. They add some much needed structure and predictability which help us ship a consistently high quality product.
 
+<!--more-->
+
 > For app teams, weekly releases may seem silly if you are in the habit of daily releases. As a framework team, we want to be more measured with releases, particularly minor and major releases, which might introduce unnecessary churn into our users' code base as they try to adopt the latest. I've started coalescing some thoughts in a draft post so more to come if you're interested in this topic.
 
 # Challenges with ad hoc releases 

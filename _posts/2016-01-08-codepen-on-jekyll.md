@@ -12,6 +12,8 @@ doing the same. This installment is the rather simple [CodePen](http://codepen.i
 pens in my posts. I took it a step further to allow including any pen by `hash` and `username` with
 the latter defaulting to the `codepen_username` value in the site's `_config.yml`.
 
+<!--more-->
+
 Below is the source (as of this writing) or you can see the [latest on Github.]
 (https://github.com/ryanjduffy/blog/blob/gh-pages/_includes/codepen.html).
 

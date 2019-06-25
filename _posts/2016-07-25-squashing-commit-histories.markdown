@@ -6,6 +6,8 @@ layout: post
 I've encountered a couple scenarios in which I wanted to squash the git history of a particular
 branch.
 
+<!--more-->
+
 The most common is to prepare a branch for a pull request so that I'm only merging a single
 commit for the feature or bug fix. I used to rebase the branch on my target (e.g. `master`) but that
 often led to multiple rounds of conflict resolution as each commit was rebased. I've since changed

@@ -4,7 +4,9 @@ title: enyo.RemoteControl
 date: 2013-01-23 20:42 -0700
 ---
 
-<p>Wanted to share a preview of a new kind I've been working on. The idea stemmed from a recent patch I submitted to fix remote loading of js into enyo. A prime use case for that capbility is to deliver a mobile website in which the entire site could be integrated into a single enyo app without loading the entire source on load. Each view could be managed by a parent enyo.Panels and loaded as requested.
+Wanted to share a preview of a new kind I've been working on. The idea stemmed from a recent patch I submitted to fix remote loading of js into enyo. A prime use case for that capbility is to deliver a mobile website in which the entire site could be integrated into a single enyo app without loading the entire source on load. Each view could be managed by a parent enyo.Panels and loaded as requested.
+
+<!--more-->
 
 To support this idea, I created a new kind called enyo.RemoteControl. In short, it has a load() method that retrieves a remote JS file and attempts to instantiate the specified kind as a child component. To configure what to load, the kind has 2 design-time parameters: href to specify the URL and remoteKind to specify the "kind" to create. It also supports fit which tells the RemoteControl to apply the enyo-fit class to the new child. Finally, it provides a scrim and spinner which displays while the script is fetched and the kind is rendered. This can be overriden through the scrimKind member.
 

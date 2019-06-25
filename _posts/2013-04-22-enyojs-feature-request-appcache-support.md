@@ -6,6 +6,8 @@ date: 2013-04-22 20:37 -0700
 
 Obviously you can add appCache to existing apps but there are a couple things I think the framework could add here. First, let's get the appcache events wired into enyo's event model.
 
+<!--more-->
+
 ```
 if(window.applicationCache) {
   enyo.dispatcher.listen(window.application, "updateReady");

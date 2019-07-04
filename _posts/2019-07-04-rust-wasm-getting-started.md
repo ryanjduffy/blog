@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Rust + WASM: Getting Started
+title: 'Rust + WASM: Getting Started'
 tags: rust, wasm
 ---
 

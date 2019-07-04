@@ -6,6 +6,8 @@ tags: rust, wasm
 
 I've been curious about the UI framework engineering opportunities of a minimal UI engine built in Rust and compiled into WASM. I'm going to document my journey here!
 
+<!--more-->
+
 # Getting Started
 
 Using the [Rust and WebAssembly](https://rustwasm.github.io/docs/book/) book

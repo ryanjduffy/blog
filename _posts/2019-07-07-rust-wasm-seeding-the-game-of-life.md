@@ -1,6 +1,7 @@
 ---
 layout: post
 title: 'Rust + WASM: Seeding the Game of Life'
+tags: rust, wasm, game-of-life
 ---
 
 After getting a [basic game of life running in Rust + WASM]({{ site.baseurl }}{%
@@ -365,3 +366,7 @@ pre.addEventListener('mouseup', () => play());
 init();
 render();
 ```
+
+---
+
+_Thanks for making it this far! These posts have gotten long with all the code samples. If you have suggestions on how to improve the code here, I'd love to hear them. I'm just getting started in Rust and appreciate advice. Reach out via a [Twitter](https://twitter.com/theryanjduffy), [email](ryan@tiqtech.com), or [GitHub Issue](https://github.com/ryanjduffy/blog/issues)._

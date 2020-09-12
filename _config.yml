@@ -11,8 +11,9 @@ email: ryan@tiqtech.com
 description: >
   Sharing thoughts, discoveries, and questions while supporting and developing JavaScript
   applications.
-baseurl: "/blog" # the subpath of your site, e.g. /blog
+baseurl: "/blog/" # the subpath of your site, e.g. /blog
 url: "ryanjduffy.github.io" # the base hostname & protocol for your site
+github_repo: blog
 github_username:  ryanjduffy
 twitter_username: theryanjduffy
 codepen_username: ryanjduffy

@@ -4,11 +4,11 @@ title: 'Rust + WASM: Seeding the Game of Life'
 tags: rust, wasm, game-of-life
 ---
 
-After getting a [basic game of life running in Rust + WASM]({{ site.baseurl }}{%
-post_url 2019-07-04-rust-wasm-getting-started %}), I wanted to expand it a bit
-further to allow seeding the initial state. Initially, I planned to allow an
-array of flags to seed any value but decided instead to use strings instead. It
-proved to be a bit more difficult but also more interesting.
+After getting a [basic game of life running in Rust + WASM]({% post_url
+2019-07-04-rust-wasm-getting-started %}), I wanted to expand it a bit further to
+allow seeding the initial state. Initially, I planned to allow an array of flags
+to seed any value but decided instead to use strings instead. It proved to be a
+bit more difficult but also more interesting.
 
 <!--more-->
 
@@ -175,7 +175,7 @@ based on the text size. So for example, the text "DAD" would be generated inside
 a 15x5 canvas. This produced some interesting results on its own since the text
 ran the the bounds and the game of life algorithm wraps around the bounds.
 
-![game of life with DAD as seed string]({{ site.baseurl }}/images/dad.gif)
+![game of life with DAD as seed string]({{ "/images/dad.gif" | relative_url}})
 
 Always up for a challenge, I decided to add support to center the text
 vertically and horizontally in the canvas which turned out to be pretty
@@ -321,7 +321,7 @@ With all of that in place, I thought it'd be fun to turn it into an easter egg
 in which the text would render initially but trigger the game once the mouse
 hovered. I won't cover the details here but it made for a fun exercise. 
 
-![game of life with Welcome to Rust+WASM as seed string]({{ site.baseurl }}/images/rust+wasm.gif)
+![game of life with Welcome to Rust+WASM as seed string]({{ "/images/rust+wasm.gif" | relative_url}})
 
 ```js
 import { Universe, UniverseOptions } from "wasm-game-of-life";

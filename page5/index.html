@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Thoughts on JS</title>
+  <meta name="description" content="Sharing thoughts, discoveries, and questions while supporting and developing JavaScript applications.
+">
+
+  <link rel="stylesheet" href="/blog/css/main.css">
+  <link rel="canonical" href="//ryanjduffy.github.io/blog/page5/">
+  <link rel="alternate" type="application/rss+xml" title="Thoughts on JS" href="//feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Thoughts on JS</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/blog/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="home">
+  
+  <h1 class="page-heading">Posts</h1>
+
+  
+  
+  <div class="pagination">
+    
+      <a href="/blog/page4">&laquo; Prev</a>
+    
+
+    
+      
+        <a href="/blog/page4">1</a>
+      
+    
+      
+        <a href="/blog/page2">2</a>
+      
+    
+      
+        <a href="/blog/page3">3</a>
+      
+    
+      
+        <a href="/blog/page4">4</a>
+      
+    
+      
+        <em>5</em>
+      
+    
+
+    
+      <span>Next &raquo;</span>
+    
+  </div>
+  
+
+
+  <ul class="post-list">
+    
+      <li>
+        <span class="post-meta">Jul 27, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/07/27/enyo-daily-6-events-part-1.html">Enyo Daily #6 - Events - Part 1</a>
+        </h2>
+        <p>
+        <p><p>I should probably talk about the design goals addressed by events but that's not a topic I'm up for tonight.  Instead, I'll jump into how events are handled in enyo and defer design talk for another day.[[MORE]]</p>
+<p>There are two kinds of events in enyo:  DOM and custom.  DOM events are fired as a result of user interaction such as clicking a control, changing a value in a field, or resizing the window.  Custom events are those defined on an enyo kind that are triggered at the discretion of the component.</p>
+<p>Custom events are simpler so we'll start with those.  These events are declared in the kind definition inside the "events" property.  Enyo expects events to be prefixed by "on" and will both warn you and add the prefix itself if it discovers an event without it.</p>
+<blockquote>
+<p>{<br />  name:"ComponentName",<br />  events:{<br />    onEventName:""<br />  }<br />}</p>
+</blockquote>
+<p>During the component creation process, enyo will automatically add a function to the component which will "fire" the event.  By default, the function will match the event name with "on" replaced with "do" (doEventName in the above example).  This is actually customizable by specifying an object instead of an empty string as the value following the event name.  For example, if you prefered fireEventName instead of doEventName, use this syntax:</p>
+<blockquote>
+<p>{<br />  name:"ComponentName",<br />  events:{<br />    onEventName:{caller:"fireEventName"}<br />  }<br />}</p>
+</blockquote>
+<p>You might be wondering why require an object literal to specify the caller if it's just a string; why not just pass "fireEventName" as the value and skip the object.  The reason is that you can also specify a default handler name for the method.  If the value following the event is a string, it is treated as the default handler name.  If it's an object, it must be included as the value of the "value" property of that object.</p>
+<blockquote>
+<p>{<br />  name:"ComponentName",<br />  events:{<br />    onEventName:{caller:"fireEventName", value:"handleEventName"},<br />    onAnotherEvent:"handleAnotherEvent"<br />  }<br />}</p>
+</blockquote>
+<p>If you're using a component that publishes an event, you can react to it by declaring the name of the handler method in the component declaration.</p>
+<blockquote>
+<p>components:[<br />  {kind:"ComponentName", onEventName:"myEventHandler"}<br />],<br />myEventHandler:function(source) {<br />  // do something<br />}</p>
+</blockquote>
+<p>If the kind specified a default handler (as illustrated above) and the owning object has a method of the same name, the declaration can be omitted.</p>
+<blockquote>
+<p>components:[<br />  {kind:"ComponentName", onEventName:"myEventHandler"}<br />],<br />myEventHandler:function(source) {<br />  // do something<br />},<br />handleAnotherEvent:function(source) {<br />  // will be found automatically since it matches the default handler name<br />}</p>
+</blockquote>
+<p>Finally, here's a complete example.  I've included some DOM event stuff that I'll cover in a future topic.</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"EventSender", name:"eventSender", onSend:"sent"},<br />        {kind:"Button", onclick:"clicked"}<br />    ],<br />    captureDomEvent:function(e) {<br />        enyo.log("A DOM event occured", e.type);<br />        <br />        // returning true would indicated the event is captured and prevent the bubble phase<br />        // thereby preventing the declared handlers (clicked in this case) from being called<br />        <br />        // returning false (or no explicit return) lets things continue<br />        return false;<br />    },<br />    clicked:function() {<br />        // trigger my custom events<br />        this.$.eventSender.go();<br />        <br />        // toggles event handler between send and secondSent ... just because ...<br />        this.$.eventSender.onSend = (this.$.eventSender.onSend === "sent") ? "secondSent" : "sent";<br />    },<br />    sent:function(source, one, two, three) {<br />        enyo.log("sent", one, two, three)<br />    },<br />    handleOnAlert:function(source, obj) {<br />        enyo.log("alerted", enyo.json.stringify(obj));<br />    },<br />    secondSent:function(source, one, two, three) {<br />        enyo.log("secondSent handles onSend now", one, two, three)<br />    }<br />}<br /><br />var _EventSender = {<br />    name:"EventSender",<br />    kind:"Component",<br />    events:{ <br />        onSend:"handleOnSend",<br />        onAlert:{value:"handleOnAlert", caller:"sendAlert"}<br />    },<br />    go:function() {<br />        this.doSend(1,2,3);    // dispatchIndirectly<br />        this.sendAlert({a:1, b:2});<br />    }<br />}<br /><br />enyo.kind(_EventSender);<br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Jul 26, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/07/26/enyo-daily-5-lists-repeaters-and-flyweights-part-2.html">Enyo Daily #5 - Lists, Repeaters, and Flyweights - Part 2</a>
+        </h2>
+        <p>
+        <p><p><a href="http://blog.technisode.com/post/7913407783/enyo-daily-2-lists-repeaters-and-flyweights-part">Part 1 of this topic</a> covered Flyweights and how they work.  Flyweights themselves are a pretty low level control and not an ideal control with which to develop.  There are a couple other controls one step up the abstraction hierarchy for rendering "lists" of items:  <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.VirtualRepeater">VirtualRepeater</a> and <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.Repeater">Repeater</a>.[[MORE]]</p>
+<p>In my current project, I needed just such a control.  Specifically, here's the problem I needed to solve:</p>
+<blockquote>
+<p>Render a configurable number of instances of a control laid out in a horizontal row.</p>
+</blockquote>
+<p>I tried 3 different approaches:</p>
+<ol><li>Programmatic loop using createComponents()</li>
+<li>enyo.VirtualRepeater</li>
+<li>enyo.Repeater</li>
+</ol><p>The first iteration used a simple for loop to create all the components in create() using createComponents().  That was functional but the resulting code was a little tough to manage (mainly due to some unique requirements for some instances of the loop).</p>
+<p>Next, I tried using VirtualRepeater.  This was a little better because I only had 1 set of Controls with which to interact but also introduced a new issue:  rendering the items horizontally rather than vertically.  There are actually 2 issues here.  First, VirtualRepeater doesn't appear to support layoutKind.  Second, the components defined as children of the VirtualRepeater are not, in fact, childNodes in the DOM.  Instead, there's an intermediate &lt;div&gt; that groups elements -- the number of which is determined by the value of stripSize.  I was able to work around this using CSS:</p>
+<blockquote>
+<p>.extras-hflexrepeater, .extras-hflexrepeater &gt; * {<br />    display:-webkit-box;<br />    -webkit-box-orientation:horizontal;<br />    -webkit-box-pack:start;<br />    -webkit-box-align:stretch;<br />}</p>
+</blockquote>
+<p>The final solution -- and the one I elected to use -- is the Repeater.  The key design difference between the VirtualRepeater and the Repeater is that whereas the VirtualRepeater uses the Flyweight to manage the DOM nodes, the Repeater simply adds more enyo Controls which each manage their own DOM nodes.  In this way, the Repeater is more akin to the programmatic loop.  In fact, that is precisely how it is implemented under the covers.</p>
+<p>The choice between the two repeater controls is more about preference in my opinion.  From a development perspective, you have to manage indices in one way or another -- either for the "row" or for the component id.  You gain some efficiency through the auto-selection of rows on event with the Flyweight but that can be mitigated equally well using custom properties on Controls when using the Repeater.</p>
+<p>I like to wrap these posts up with a functional code example.  In this case, I've included both a VirtualRepeater and Repeater with the same results to illustrate how they're both used.  Note that the VirtualRepeater code requires the CSS from above.</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"Scroller", height:"80px", vertical:false, components:[<br />            {kind:"VirtualRepeater", name:"fw", className:"extras-hflexrepeater", onSetupRow:"setupVirtualRepeaterRow", components:[<br />                {width:"120px", components:[<br />                    {kind:"Control", name:"text"},<br />                    {kind:"Button", name:"button", onclick:"buttonClicked"}<br />                ]}<br />            ]}<br />        ]},<br />        {kind:"Scroller", height:"80px", vertical:false, components:[<br />             {kind:"Repeater", name:"repeater", layoutKind:"HFlexLayout", onSetupRow:"setupRepeaterRow"}<br />         ]}<br />    ],<br />    buttonClicked:function() {<br />        // the node is automatically mapped to the right instance on event<br />        // but the enyo-managed data (e.g. this.$.text.getContent()) isn't.<br />        // see enyo.StateManger for a mechanism to save/restore component state<br />        console.log("clicked",this.$.text.node.innerText);<br />    },<br />    setupVirtualRepeaterRow:function(source, index) {<br />        if(index&lt;25) {<br />            this.$.text.setContent("I'm instance "+index);<br />            this.$.button.setCaption("Button #"+index);<br />            <br />            return true;<br />        }<br />    },<br />    setupRepeaterRow:function(source, index) {<br />        if(index&lt;25) {<br />            // note that names have to be unique because, unlike VirtualRepeater,<br />            // each of these enyo.Controls will exist as children of Repeater <br />            return {width:"120px", components:[<br />                {kind:"Control", content:"I'm instance "+index, name:"text"+index},<br />                {kind:"Button", name:"button"+index, caption:"Button #"+index, onclick:"buttonClicked"}<br />            ]}<br />        }<br />    }<br />};<br /><br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Jul 25, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/07/25/enyo-daily-4-box-model.html">Enyo Daily #4 - Box Model</a>
+        </h2>
+        <p>
+        <p><p>The flexible box controls and layouts in Enyo are really just convenience wrappers around the standard CSS3 flexible box model.  If you haven't looked into the CSS method before, I suggest you take a few moments to look into it.  <a href="http://ajaxian.com/archives/css-3-flexible-box-model">Ajaxian has a post</a> that gives you a quick intro; Html5 Rocks has <a href="http://www.html5rocks.com/en/tutorials/flexbox/quick/">another good one</a>.  W3C also has the <a href="http://www.w3.org/TR/css3-flexbox/">draft spec</a> for perusal; there's also an <a href="http://www.w3.org/TR/2009/WD-css3-flexbox-20090723/">earlier draft</a> that appears to match WebKit's implementation a little more closely.</p>
+[[MORE]]
+<p>There are two ways in Enyo to implement a flexible layout:  FlexBox and FlexLayout.  You could also code the CSS yourself which is completely legal so I suppose there are 3 ways ... but let's pretend you don't want to do that right now.  The key difference between the Box and the Layout is that the former is a Control and the latter a Component.  This means that HFlexBox and VFlexBox are renderable DOM nodes whereas HFlexLayout and VFlexLayout are not.</p>
+<p>In reality, all of the relevant code is provided by the Layout components.  The HFlexBox and VFlexBox are simply Controls with layoutKind set to their appropriate layout.  I've found that I use the FlexBoxes when I just need a generic control to layout child controls and the FlexLayouts when I'm using a more complex kind.</p>
+<p>One key difference between the "usual" implementation of the flexible box model and enyo's is how it handles the flexed components.  Normally, a node that is flexed will be given its natural space and its portion of the remaining.  In enyo, it only receives the left over space.  It accomplishes this by setting the width of the node to 0px as an inline style.  Here's the comment from FlexLayout:</p>
+<blockquote>
+<p>// we redefine flex to mean 'be exactly the left over space'<br />// as opposed to 'natural size plus the left over space'</p>
+</blockquote>
+<p>The result of this is that some components might be forced to overlap if the remaining space isn't sufficient to hold them.  Here's a quick example:</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"HFlexBox", components:[<br />            {flex:1, components:[<br />                // on a 1024x768 screen, this button will be overlapped<br />                // by the next one because it only gets the<br />                // remaining space<br />                {kind:"Button", width:"500px"}<br />            ]},<br />            {kind:"Button", width:"300px"},<br />            {kind:"Button", width:"300px"}<br />        ]}<br />    ]<br />};<br /><br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Jul 22, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/07/22/enyo-daily-3-ownership.html">Enyo Daily #3 - Ownership</a>
+        </h2>
+        <p>
+        <p>Ownership in Enyo rivals function binding in Mojo for the topic most likely to trip someone up when they start development.  The developer guide has a really good <a href="https://developer.palm.com/content/api/dev-guide/enyo/more-on-ownership-and-containment.html">overview on ownership and containment</a> but I wanted to comment on a couple additional items.[[MORE]]</p>
+<p>From a practical perspective, ownership affects 2 things.  First, every control has a component hash (this.$) that contains references to all other components it owns.  The owned components can be referenced by their names on the hash.  Second, when Enyo auto-wires events for a control, it looks for the declared method on the owning object.</p>
+<p>There are 2 primary ways in which a component ownership can be established.  The most common approach is declaratively in the components array in a kind definition.  Any component declared in this way is owned by the top level component.  The second approach is programattically via the createComponent or createComponents methods.  These methods are identical except the earlier expects a single object whereas the latter expects an array as its first parameter.  With these methods, if you do not explicitly declare the owner (via the owner member of the passed object), it will default to the caller.</p>
+<blockquote>
+<p>enyo.kind({<br />  name:"myControl",<br />  components:[<br />    {kind:"Button", name:"myButton", onclick:"clicked"},<br />    {kind:"Control", name:"myText", content:"Some text content"}<br />  ],<br />  create:function() {<br />    this.inherited(arguments);<br /><br />    this.createComponent({kind:"Button", name:"newButton", "clicked"});<br /><br />    // this onclick handler will not execute<br />    this.$.myText.createComponent({kind:"Button", name:"anotherNewButton", onclick:"clicked"}); <br /><br />    this.$.myText.createComponent({kind:"Button", name:"finalNewButton", owner:this, onclick:"clicked"});<br />  },<br />  clicked:function() { /* do something */}<br />})</p>
+</blockquote>
+<p>In the above example:</p>
+<ul><li>Both myButton and myText are owned by myControl using the declarative method</li>
+<li>newButton is owned by myControl by default (no owner specified and creatComponent call on myControl)</li>
+<li>anotherNewButton is owned by myText by default</li>
+<li>finalNewButton is owned by myControl (because owner:this is specified)</li>
+</ul>
+<p>All the onclick handlers would be mapped to myControl.clicked() except anotherButton because it is owned by myText.</p>
+<p>As a general rule, any components you create should be owned by the top level kind.  In other words, always pass owner:this as part of object to createComponent.  If you find yourself with a reason that a child of your kind should be the owner of the component, you probably would be better off encapsulating the child and the new component into a completely separate kind.  More on that in another post.</p>
+<p>A final note on containment:  Containment is primarily concerned with DOM rendering.  If you are working with (big C) Components (meaning they directly inherit from Component, not Control or its sub-kinds), containment doesn't appear to matter.  For Controls, containment directly affects the DOM tree.  So, when you're working on your app's CSS, you'll be able to reference the containment hierarchy to define your selectors.</p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Jul 21, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/07/21/enyo-daily-2-lists-repeaters-and-flyweights-part-1.html">Enyo Daily #2 - Lists, Repeaters, and Flyweights - Part 1</a>
+        </h2>
+        <p>
+        <p><p>The new approach for list components in enyo has proven to be a difficult topic to fully understand.  I don’t pretend to have a complete grasp but rummaging through the source code has helped me immensely.  Today, I want to cover the magic that is the Flyweight.</p>
+[[MORE]]
+<p>The Flyweight is appropriately described by the enyo API docs as “a control designed to be rendered multiple times.”  It stands to reason why this kind of a control would be good for lists.  The Flyweight enables you to define a template for a list item and the list renders the Flyweight multiple times – once for each list item.  If you’ve used the VirtualList or VirtualRepeater controls, you’ll know that you don’t have to define a Flyweight to get things running; those controls hide the Flyweight.  Nonetheless, it’s handy to understand how the Flyweight works because its design directly affects the design of the higher level controls.</p>
+<p>The most important feature of Flyweights is that unlike most enyo controls where the control has a single top-level node, it may have multiple nodes for a single enyo control.  This is where things begin to get murky for devs.  Consider the following code using the VirtualRepeater.  VirtualRepeater, as the name inplies, will create a node containing the controls declared in its component block for each successful return from onSetupRow.  It accomplishes this by employing the Flyweight.</p>
+<p>So, if in setupRow() I configure the repeater to have 10 rows, how would I later modify the text of the fifth row, for example?</p>
+<blockquote>
+<p>{<br />        kind:”VirtualRepeater”,<br />        name:”myRepeater”,<br />        components:[<br />                {name:”text”},<br />                {name:”button”,kind:”Button”, onclick:”buttonClicked”}<br />        ],<br />        onSetupRow:”setupRow”<br />}</p>
+</blockquote>
+<p>As always, there are several ways to solve the problem but the one I’ll use relates to setting the “focus” of the Flyweight.  Because the Flyweight has a single component that represents multiple instances in the DOM, you have to tell it on which instance you wish to operate.  VirtualRepeater exposes a method to do such a thing:  controlsToRow(inRowIndex).  Under the covers, this method calls setNode() on the Flyweight to “focus” it on the right instance.  After that, you can reference the components as you would any other in enyo.</p>
+<blockquote>
+<p>highlightRow:function(rowIndex) {<br />        this.$.myRepeater.controlsToRow(rowIndex);<br />        this.$.text.setClassName(“highlighted-row”);  // invented class for illustration<br />}</p>
+</blockquote>
+<p>The Flyweight has a nice feature that will focus on an instance in response to an event that occurs on control of that instance. Using our example above, when buttonClicked is called, the instance containing the button will automatically have focus so no additional calls are necessary:</p>
+<blockquote>
+<p>buttonClicked:function(source, event) {<br />        // no need to call controlsToRow beforehand<br />        this.$.text.setContent(“I’ve been clicked!”);<br />}</p>
+</blockquote>
+<p>There is a little extra going on in VirtualList and VirtualRepeater to make this work correctly.  While Flyweight will automatically link itself to an instance's node on event and you can explicitly focus an instance using setNode(), this only ties the Flyweight to the node, not the enyo Component.  The List and Repeater components employ a StateManager component to save and restore the state of components when the Flyweight's focus changes.  Take a look in the source of those components as well as the RowServer for detail</p>
+<p>To wrap up, here’s a complete example using Flyweight directly to illustrate:</p>
+<blockquote>
+<p> var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"Flyweight", name:"fw", layoutKind:"HFlexLayout", components:[<br />            {kind:"Control", name:"text"},<br />            {kind:"Button", name:"button", onclick:"buttonClicked"}<br />        ]}<br />    ],<br />    buttonClicked:function() {<br />        // the node is automatically mapped to the right instance on event<br />        // but the enyo-managed data (e.g. this.$.text.getContent()) isn't.<br />        // see enyo.StateManger for a mechanism to save/restore component state<br />        console.log("clicked",this.$.text.node.innerText);<br />    },<br />    getInnerHtml:function() {<br />        var h = [];<br />        <br />        // make a bunch of instances of the flyweight<br />        for(var i=0;i&lt;10;i++) {<br />            this.$.text.setContent("I'm instance "+i);<br />            this.$.button.setCaption("Button #"+i)<br />            h.push(this.getChildContent());<br />        }<br />        <br />        // see comment in enyo.RowServer.generateRow()<br />        this.$.fw.needsNode = true;<br />        <br />        return h.join("");<br />    }<br />};<br /><br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Jul 20, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/07/20/enyo-daily-1-preferences.html">Enyo Daily #1 - Preferences</a>
+        </h2>
+        <p>
+        <p>I'm planning to try a new thing here.  I'm relatively active in the <a href="https://developer.palm.com/distribution/index.php" target="_blank">Palm Dev Forums</a> and have pulled together a list of topics that seem to be relatively common.  So, I'm hoping to do a daily (maybe, perhaps every few days ...) post on how to solve those common issues.[[MORE]]</p>
+<p>To start, I'm going to cover how to store preferences using the system service.  The <a href="https://developer.palm.com/content/api/dev-guide/enyo/tutorial.html" target="_blank">enyo tutorial</a> covers this briefly but unfortunately inaccurately right now.</p>
+<p>The low level approach is to call the system service directly.</p>
+<blockquote>
+<p>// define the service in the components block<br />{name: "preferencesService", kind: "enyo.SystemService"},</p>
+<p>// elsewhere, in create() for example, call getPreferences passing<br />// the desired keys<br />create:function() {<br />    this.inherited(arguments);<br />    this.$.preferencesService.call({<br />        keys: ["pref1", "pref2"]<br />    },{<br />        method: "getPreferences",<br />        onSuccess: "gotPreferences",<br />        onFailure: "gotPreferencesFailure"<br />    });<br />}</p>
+<p>// setting the preferences uses a similar call.  you'd execute this<br />// on button click, property change, or view change, for example<br />buttonClicked:function(source, event) {<br />    this.$.preferencesService.call({<br />        "pref1":"value of pref 1",<br />        "pref2":"value of pref 2"<br />    },{<br />        method: "setPreferences",<br />        onSuccess: "setPreferences",<br />        onFailure: "setPreferencesFailure"<br />    });<br />}</p>
+</blockquote>
+<p>That works perfectly fine but is a little verbose for my taste.  There's also an (undocumented) PreferencesService kind you can use.  With that component, you're insulated from the underlying system service and instead call one of its two methods:</p>
+<blockquote>
+<p>// passing an object of name/value pairs<br />updatePreferences(inPreferences)</p>
+<p>// passing an array of key names<br />fetchPreferences(inKeys, inSubscribe)</p>
+</blockquote>
+<p>It also has an onFetchPreferences event to which you can listen to be notified when preferences have been loaded.</p>
+<p>Finally, I've created a new kind as part of my <a href="http://github.com/tiqtech/enyo-extras" target="_blank">enyo-extras repo</a> called AutoPreferencesService.  This component works by inspecting the published properties of its sub-kind and automatically loading those preferences and auto-wiring change events to update preferences.  This allows you to create a app or feature-specific preferences interface that's more semantic while still insulating the app from directly interacting with the system service.</p>
+<blockquote>
+<p>// create a kind inheriting from AutoPreferencesService<br />enyo.kind({<br />    name:"myApp.ExamplePrefs",<br />    kind:"extras.AutoPreferencesService",<br />    published:{  // declare your preferences and default values<br />        pref1:"",<br />        pref2:""<br />    }<br />});</p>
+<p>// add the new kind to you apps components block<br />{kind:"myApp.ExamplePrefs", onLoad:"prefsReady", name:"prefs"}</p>
+<p>// add onLoad callback handler<br />prefsReady:function() {<br />    var pref1 = this.$.prefs.getPref1();<br />    // do something useful with pref1<br />}</p>
+<p>// update preference as needed<br />saveButtonClicked:function() {<br />   this.$.prefs.setPref1("new value");<br />}</p>
+</blockquote>
+<p>This will be my new default way to deal with preferences.  What do you think?  Which approach is your preference or are you dealing with preferences a different way entirely?</p>
+
+        </p>
+      </li>
+    
+  </ul>
+
+  
+  
+  <div class="pagination">
+    
+      <a href="/blog/page4">&laquo; Prev</a>
+    
+
+    
+      
+        <a href="/blog/page4">1</a>
+      
+    
+      
+        <a href="/blog/page2">2</a>
+      
+    
+      
+        <a href="/blog/page3">3</a>
+      
+    
+      
+        <a href="/blog/page4">4</a>
+      
+    
+      
+        <em>5</em>
+      
+    
+
+    
+      <span>Next &raquo;</span>
+    
+  </div>
+  
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Thoughts on JS</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Thoughts on JS</li>
+          <li><a href="mailto:ryan@tiqtech.com">ryan@tiqtech.com</a></li>
+          <li><a href="/blog/feed.xml">RSS</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/ryanjduffy"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">ryanjduffy</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/theryanjduffy"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">theryanjduffy</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Sharing thoughts, discoveries, and questions while supporting and developing JavaScript applications.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Thoughts on JS</title>
+  <meta name="description" content="Sharing thoughts, discoveries, and questions while supporting and developing JavaScript applications.
+">
+
+  <link rel="stylesheet" href="/blog/css/main.css">
+  <link rel="canonical" href="//ryanjduffy.github.io/blog/page4/">
+  <link rel="alternate" type="application/rss+xml" title="Thoughts on JS" href="//feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Thoughts on JS</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/blog/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="home">
+  
+  <h1 class="page-heading">Posts</h1>
+
+  
+  
+  <div class="pagination">
+    
+      <a href="/blog/page3">&laquo; Prev</a>
+    
+
+    
+      
+        <a href="/blog/page3">1</a>
+      
+    
+      
+        <a href="/blog/page2">2</a>
+      
+    
+      
+        <a href="/blog/page3">3</a>
+      
+    
+      
+        <em>4</em>
+      
+    
+      
+        <a href="/blog/page5">5</a>
+      
+    
+
+    
+      <a href="/blog/page5">Next &raquo;</a>
+    
+  </div>
+  
+
+
+  <ul class="post-list">
+    
+      <li>
+        <span class="post-meta">Aug 19, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/08/19/enyo-daily-16-events-part-4.html">Enyo Daily #16 - Events - Part 4</a>
+        </h2>
+        <p>
+        <p><p>A question came up on the forums regarding global custom events.  The use case described was the need to pass an event up or down the object hierarchy just to react to it at the appropriate level.  Enyo actually can support this with the current architecture using its event dispatcher and it only requires a couple lines of code to implement.[[MORE]]</p>
+<p>To fire the event, use window.enyo.dispatch(eventObject). eventObject must define a type member.</p>
+<blockquote>
+<p>window.enyo.dispatch({type:"customGlobalEvent", data:"something to pass"});</p>
+</blockquote>
+<p>To catch the event, add your control to the rootHandler's listeners and implement a xxxHandler method for the event.</p>
+<blockquote>
+<p>create:function() {<br />  this.inherited(arguments);<br />  enyo.dispatcher.rootHandler.addListener(this);<br />},<br />customGlobalEventHandler:function(sender, param) {<br />  enyo.log("customGlobalEvent", param.data);  // logs: customGlobalEvent something to pass<br />}</p>
+</blockquote>
+<p>Here it is in action in my continuing events example:</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"ApplicationEvents", name:"appEvents"},<br />        {kind:"EventSender", name:"eventSender", onSend:"sent"},<br />        {kind:"Button", onclick:"clicked"},<br />        {kind:"Input", onkeypress:"press"}<br />    ],<br />    create:function() {<br />        this.inherited(arguments);<br />        <br />        // map all ApplicationEvents to logAppEvent<br />        var ae = this.$.appEvents;<br />        Object.keys(enyo.ApplicationEvents.prototype.events).forEach(function(key) {<br />            //enyo.log("setting handler for ",key);<br />            ae[key] = "logAppEvent";<br />        });<br />        <br />        enyo.dispatcher.rootHandler.addListener(this);<br />    },<br />    logAppEvent:function(source, e) {<br />        enyo.log("logAppEvent",e.type);<br />    },<br />    resizeHandler:function() {<br />        enyo.log("dimensions",window.document.body.offsetWidth,window.document.body.offsetHeight);<br />    },<br />    captureDomEvent:function(e) {<br />        enyo.log("A DOM event occured", e.type);<br />        <br />        // returning true would indicated the event is captured and prevent the bubble phase<br />        // thereby preventing the declared handlers (clicked in this case) from being called<br />        <br />        // returning false (or no explicit return) lets things continue<br />        return false;<br />    },<br />    dispatchDomEvent:function(e) {<br />        // like any other method, you could override dispatchDomEvent and implement custom routing<br />        e.myCustomField = "This is a custom field";<br />        <br />        return this.inherited(arguments);<br />    },<br />    press:function(source, event) {<br />        enyo.log(source, event);<br />    },<br />    clickHandler:function(source, event) {<br />        enyo.log("bubbled up to me", event.myCustomField);<br />        <br />        // calling event.stopPropagation() or returning true will end the bubble phase<br />    },<br />    clicked:function(source, event) {<br />        // trigger my custom events<br />        this.$.eventSender.go();<br />        <br />        // toggles event handler between send and secondSent ... just because ...<br />        this.$.eventSender.onSend = (this.$.eventSender.onSend === "sent") ? "secondSent" : "sent";<br />        <br />        // calling event.stopPropagation() or returning true will end the bubble phase<br />    },<br />    sent:function(source, one, two, three) {<br />        enyo.log("sent", one, two, three)<br />    },<br />    handleOnAlert:function(source, obj) {<br />        enyo.log("alerted", enyo.json.stringify(obj));<br />    },<br />    secondSent:function(source, one, two, three) {<br />        enyo.log("secondSent handles onSend now", one, two, three)<br />    },<br />    customGlobalEventHandler:function(sender, param) {<br />        enyo.log("customGlobalEvent", param.data);<br />    }<br />}<br /><br />var _EventSender = {<br />    name:"EventSender",<br />    kind:"Component",<br />    events:{ <br />        onSend:"handleOnSend",<br />        onAlert:{value:"handleOnAlert", caller:"sendAlert"}<br />    },<br />    create:function() {<br />        this.inherited(arguments);<br />        <br />        enyo.dispatcher.rootHandler.addListener(this);<br />    },<br />    go:function() {<br />        this.doSend(1,2,3);    // dispatchIndirectly<br />        this.sendAlert({a:1, b:2});<br />        window.enyo.dispatch({type:"customGlobalEvent", data:"something to pass"});<br />    },<br />    customGlobalEventHandler:function(sender, e) {<br />        enyo.log("also caught customGlobalEvent");<br />    }<br />}<br /><br />enyo.kind(_EventSender);<br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Aug 18, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/08/18/enyo-daily-15-canvas.html">Enyo Daily #15 - Canvas</a>
+        </h2>
+        <p>
+        <p><p>Today's been an interesting day for webOS.  If you're a webOS developer (which is probably a safe assumption if you're reading this), you're probably already aware of HP's decision to jettison its hardware division.  As a result, there are in effect no webOS phones or tablets to be released unless they find a suitable hardware partner.  According to the fine folks over at <a href="http://thisismynext.com/2011/08/18/hp-not-walking-away-webos-exclusive-details/" target="_blank">This Is My Next</a>, HP isn't walking away from webOS.  For now, I'll buy into that and continue to create things for a platform I believe deserves to thrive.</p>
+<p>That said, I've taken time off from posting due to the birth of my daughter (our third child).  As a result, I haven't taken much time to plan out the next couple posts.  But, I wanted to get something out today so I'll cover how to get started with the HTML5 canvas tag in enyo.</p>
+[[MORE]]
+<p>Enyo doesn't provide much for developing in canvas; it doesn't really need to.  Canvas in enyo is the same as in normal web development.  There are a couple minor hurdles you have to overcome, however.</p>
+<p>First, how do you create a &lt;canvas&gt; tag when all enyo controls are defined in JavaScript?  The undocumented nodeTag property, of course!  DomNode includes this property and uses it to determine the string to pass to document.createElement.  So, to create an enyo canvas control, set the nodeTag property to "canvas"!</p>
+<blockquote>
+<p>{name:"myCanvasTag", nodeTag:"canvas"}</p>
+</blockquote>
+<p>Second, how do you get a reference to the drawing context to draw on the canvas.  Like other enyo controls, the DOM node doesn't exist until the control is rendered.  The simplest solution is to override rendered() in the control containing the canvas and call your drawing methods there.</p>
+<blockquote>
+<p>rendered:function() {<br />    var n = this.$.myCanvasTag.hasNode();<br />    var ctx = n.getContext("2d");<br />    ctx.fillRect(0,0,100,100);<br />}</p>
+</blockquote>
+<p>Here's a complete example that creates 5 canvas tags using VirtualRepeater.</p>
+<blockquote>
+<p>var _App = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {name: "repeater", kind:"VirtualRepeater", onSetupRow:"setupRow", components:[<br />            {name: "canvas", nodeTag:"canvas"}<br />        ]}<br />    ],<br />    rendered:function() {<br />        this.inherited(arguments);<br />        <br />        for(var i=0;i&lt;5;i++) {<br />            // this is a protected method so ... palm may not like you using it ...<br />            this.$.repeater.prepareRow(i);<br />            var n = this.$.canvas.hasNode();<br />            n.width = 150;<br />            n.height = 150;<br />            n.getContext("2d").strokeText("I am item " + i, 10, 10);<br />        }<br />    },<br />    setupRow:function(source, index) {<br />        if(index &lt; 5) {<br />            return true;<br />        }<br />    }<br />}<br /><br />enyo.kind(_App);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Aug 10, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/08/10/enyo-daily-14-scroller-fades.html">Enyo Daily #14 - Scroller Fades</a>
+        </h2>
+        <p>
+        <p><p>I found it strange that the generic <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.Scroller" target="_blank">Scroller </a>control didn't have scroll fades; instead you have to use <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.FadeScroller" target="_blank">FadeScroller</a>.  Even more troublesome, if you wanted fades on a <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.SnapScroller" target="_blank">SnapScroller</a>, for example, the framework didn't provide for that.  The solution is easy fortunately (particularly when you steal the code from FadeScroller!).[[MORE]]</p>
+<p>The code use is directly adapted from FadeScroller.  I had some issues copying it verbatim but the effect is the same.  There are two steps to getting fades working.</p>
+<p>First, you need to create an instance of the <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.ScrollFades" target="_blank">ScrollFades</a> kind.  I at first tried adding it as a child of Scroller but the fades wouldn't position correctly.  The cause was that as a child of the scroller client (inner wrapper), the fade would get scroller along with the other content.  The fades really needed to be siblings of the client so creating them as chrome rather than normal components did the trick (More on chrome in a future post).</p>
+<p>Below, I'm creating the ScrollFades component as chrome of the SnapScroller(createChrome = createcomponent with isChrome=true).</p>
+<blockquote>
+<p>create:function() {<br />    this.inherited(arguments);<br />    this.$.scroller.createComponent({kind:"ScrollFades", name:"fades", isChrome:true, owner:this});<br />},</p>
+</blockquote>
+<p>Second, I hook scroll events for the Scroller to the showHideFades method of ScrollFades.  The ScrollFades component takes care of determine which fades to show based on the position of the scroller.</p>
+<blockquote>
+<p>// in the components block ...<br />{kind:"SnapScroller", vertical:false, height:"100px", name:"scroller", onScroll:"scrolled", components:[ /* components */}<br /><br />// later on ...<br />scrolled:function(sender) {<br />    this.$.fades.showHideFades(this.$.scroller);<br />}</p>
+</blockquote>
+<p>And that's it!  If you're looking for some homework, make this into a custom FadeSnapScroller control that encapsulates the fades.  Here's the complete example:</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"SnapScroller", vertical:false, height:"100px", name:"scroller", onScroll:"scrolled", components:[<br />                {content:"Button 1", style:"margin:10px"},<br />                {content:"Button 2", style:"margin:10px"},<br />                {content:"Button 3", style:"margin:10px"},<br />                {content:"Button 4", style:"margin:10px"},<br />                {content:"Button 5", style:"margin:10px"},<br />                {content:"Button 6", style:"margin:10px"},<br />                {content:"Button 7", style:"margin:10px"},<br />                {content:"Button 8", style:"margin:10px"},<br />                {content:"Button 9", style:"margin:10px"},<br />                {content:"Button 10", style:"margin:10px"},<br />                {content:"Button 11", style:"margin:10px"},<br />                {content:"Button 12", style:"margin:10px"},<br />                {content:"Button 13", style:"margin:10px"},<br />                {content:"Button 14", style:"margin:10px"},<br />                {content:"Button 15", style:"margin:10px"},<br />        ]}<br />    ],<br />    create:function() {<br />        this.inherited(arguments);<br />        this.$.scroller.createComponent({kind:"ScrollFades", name:"fades", isChrome:true, owner:this});<br />    },<br />    scrolled:function(sender) {<br />        this.$.fades.showHideFades(this.$.scroller);<br />    }<br />}<br /><br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Aug 9, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/08/09/enyo-daily-13-toolbar-controls.html">Enyo Daily #13 - Toolbar Controls</a>
+        </h2>
+        <p>
+        <p><p>One of the reasons I enjoy working with webOS is its foundation of standard web technologies.  In practice, this translates to the ability to customize the behavior and display of the framework in ways its creators didn't foresee.  One such mechanism is CSS -- parodoxically my most and least favorite.  I love that I can throw a -webkit-border-radius on a &lt;div&gt; rather than opening up a graphics program and the <a href="http://blog.technisode.com/post/8055838446/enyo-daily-4-box-model" target="_blank">flexible box model is amazing</a> (coming from someone who lived by nested tables back in the day).</p>
+<p>HP has already covered most of the built-in Toolbar controls in their <a href="https://developer.palm.com/content/api/dev-guide/enyo/toolbars.html" target="_blank">Enyo Developer Guide</a> but there's nothing preventing you from dropping any control you want in a Toolbar.  I'll cover a couple examples and show how reusing existing enyo CSS classes and tweaking others can make other controls look at home in the Toolbar.</p>
+[[MORE]]
+<p>I'll start with covering a couple controls the dev guide leaves out:  ToolInput, ToolInputBox, and ToolSearchInput.  In each case, the controls are identical to their non-Toolbar counterparts with the exception of the CSS classes applied.  In fact, each inherits directly from their respective "normal" control.  I mention them here mainly to illustrate a template for how you might ready other controls (Enyo or custom) to be displayed in a Toolbar.<br /><br />To illustrate, I create a new ToolSlider and ToolCustomListSelector control.  ToolSlider inherits from Slider and adds the classes from the ToolInput control.  I also added an extras-tool-slider class to reduce the margins to make it fit better. </p>
+<blockquote>
+<p>enyo.kind({<br />  name:"ToolSlider",<br />  kind:"Slider",<br />  className:"extras-tool-slider enyo-input enyo-tool-input"<br />});</p>
+</blockquote>
+<p>ToolCustomListSelector inherits from CustomListSelector (surprising, I know) and adds the classes from ToolButton.  Again, I added an additional class, extras-tool-listselector, to manage the height of the control.</p>
+<blockquote>
+<p>enyo.kind({<br />  name:"ToolCustomListSelector",<br />  kind:"CustomListSelector",<br />  className:"extras-tool-listselector enyo-tool-button-client enyo-tool-button-captioned"<br />});</p>
+</blockquote>
+<p>Here's everything -- all the built-in controls plus the 2 custom controls above -- in action.</p>
+<p>CSS</p>
+<blockquote>
+<p>.extras-tool-listselector .enyo-listselector-arrow {<br />    min-height:20px;<br />}<br /><br />.extras-tool-slider .enyo-slider-progress {<br />    margin:10px 5px;<br />}</p>
+</blockquote>
+<p>JavaScript</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"Toolbar", name:"tb1", pack:"justify", name:"toolbar", components:[<br />            {kind:"ToolButton", caption:"Button"},<br />            {kind:"ToolInput", hint:"important stuff"},<br />            {kind:"ToolSearchInput"},<br />            {kind:"RadioToolButtonGroup", components:[<br />                  {label:"First"},<br />                  {label:"Second"},<br />                  {label:"Third"},<br />            ]},<br />            {kind:"ToolButtonGroup", components:[<br />                {kind:"GroupedToolButton", caption:"Button"},<br />                {kind:"GroupedToolButton", caption:"Button"},<br />                {kind:"GroupedToolButton", caption:"Button"},<br />            ]},<br />        ]},<br />        {kind:"Toolbar", name:"tb2", pack:"justify", components:[<br />            {kind:"ToolInputBox", width:"300px", components:[<br />                 {kind:"Input", styled:false, flex:1},<br />                 {kind: "ToolCustomListSelector", value: 3, items: [<br />                     {caption: "Google", value: 1},<br />                     {caption: "Bing", value: 2},<br />                     {caption: "Alta Vista", value: 3},<br />                 ]},<br />            ]},<br />            {kind: "ToolCustomListSelector", value: 2, items: [<br />                {caption: "One", value: 1},<br />                {caption: "Two", value: 2},<br />                {caption: "Three", value: 3},<br />            ]},<br />            {kind:"ToolSlider", maximum:10, minimum:0, value:5, width:"200px"},<br />        ]}<br />    ]<br />}<br /><br />enyo.kind({name:"ToolCustomListSelector", kind:"CustomListSelector", className:"extras-tool-listselector enyo-tool-button-client enyo-tool-button-captioned"})<br />enyo.kind({name:"ToolSlider", kind:"Slider", className:"extras-tool-slider enyo-input enyo-tool-input"})<br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Aug 8, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/08/08/enyo-daily-12-3-ways-to-include-content.html">Enyo Daily #12 - 3 Ways to Include Content</a>
+        </h2>
+        <p>
+        <p><p>There are several use cases for including large blocks of content into your applications.  A couple common scenarios are to include a basic help system or "About" information.  I'll cover three possible ways to do this today.[[MORE]]</p>
+<p>Here's the HTML I'll use for illustration.  Note that it doesn't include any enyo kinds, only raw HTML.  If you want to include enyo, these solutions won't work for you.</p>
+<blockquote>
+<p>&lt;div class="help"&gt;<br />  &lt;div class="topic"&gt;Getting Started&lt;/div&gt;<br />  &lt;div class="content"&gt;<br />    Here is a quick introduction to imported html into you enyo applications.  You can include &lt;a href="http://developer.palm.com"&gt;links to external resources&lt;/a&gt; or other random markup as you need.  Normally, you'd have much more content but this will do for illustration.<br />  &lt;/div&gt;<br />&lt;/div&gt;</p>
+</blockquote>
+<p>The simplest solution for small blocks of content is the content property from <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.Control" target="_blank">Control </a>(technically <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.DomNodeBuilder" target="_blank">DomNodeBuilder</a>) and its children.  Since it's a published property, you can interact with it in the same way as any other property -- either declaratively in the component definition or programmatically via setContent().  You can specify any valid HTML for content and it will be included as the innerHTML of the node.  One caveat here is that HTML is escaped by default; to include the raw HTML, set the allowHtml property to true.</p>
+<blockquote>
+<p>{content:<br />'&lt;div class="help"&gt;' +<br />'  &lt;div class="topic"&gt;Getting Started&lt;/div&gt;' +<br />'  &lt;div class="content"&gt;' +<br />'    Here is a quick introduction to imported html into you enyo applications.  You can include &lt;a href="http://developer.palm.com"&gt;links to external resources&lt;/a&gt; or other random markup as you need.  Normally, you'd have much more content but this will do for illustration.' +<br />'  &lt;/div&gt;' +<br />'&lt;/div&gt;'}</p>
+</blockquote>
+<p>That reasonably supportable for that length of text.  If, however, you had 10 topics, your enyo code would become untenable.  If the text is relatively static, at least static for a particular version of your application, the <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#base/controls/HtmlContent.js" target="_blank">HtmlContent </a>kind might be a good fit.</p>
+<p>HtmlContent allows you to specify content inside your HTML document (as opposed to the JavaScript document containing your enyo components).  The content is referenced by specifying the id of the node wrapping it in the srcId property of HtmlContent.  One nice feature of HtmlContent you don't get in the other options is a special event handler for links.  So, in addition to "regular" links, you can encode special instructions in the href attribute of anchor tags to execute unique actions.</p>
+<p>index.html</p>
+<blockquote>
+<p>&lt;!doctype html&gt;<br />&lt;html&gt;<br />&lt;head&gt;<br />    &lt;title&gt;technisode example app&lt;/title&gt;<br />    &lt;script src="/dev/enyo/1.0/framework/enyo.js" type="text/javascript"&gt;&lt;/script&gt;<br />&lt;/head&gt;<br />&lt;body&gt;<br />&lt;div id="helpContent"&gt;<br />    &lt;div class="help"&gt;<br />      &lt;div class="topic"&gt;Getting Started&lt;/div&gt;<br />      &lt;div class="content"&gt;<br />        Here is a quick introduction to imported html into you enyo applications.  You can include &lt;a href="http://developer.palm.com"&gt;links to external resources&lt;/a&gt; or other random markup as you need.  Normally, you'd have much more content but this will do for illustration.<br />      &lt;/div&gt;<br />    &lt;/div&gt;<br />&lt;/div&gt;<br />&lt;script type="text/javascript"&gt;<br />    new com.technisode.example.App().renderInto(document.body);<br />&lt;/script&gt;<br />&lt;/body&gt;<br />&lt;/html&gt;</p>
+</blockquote>
+<p>javascript</p>
+<blockquote>
+<p>{kind:"HtmlContent", srcId:"helpContent", onLinkClick:"linkClicked"},</p>
+</blockquote>
+<p>The third option is <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.AjaxContent" target="_blank">AjaxContent</a>.  It functions similar to HtmlContent except that it loads the content asynchronously from an external file -- either remotely or locally.  With both the content property and the HtmlContent control, the DOM nodes are available as soon as they are created.  <del>With AjaxContent, the nodes aren't available until the onContentChanged event fires.</del>  Turns out that the DOM nodes aren't quite ready when onContentChanged fires; it fires 1 line earlier.  I assume the reason is to allow you to modify the content before it is inserted.  Regardless, if you want to find or traverse the HTML using DOM methods, you can't do so quite yet.</p>
+<p>A simple solution is to wrap any DOM manipulation calls in an enyo.asynchMethod.  This will allow the current call stack to complete which includes inserting the content.  This method is illustrated in the complete example below.</p>
+<blockquote>
+<p>{kind:"AjaxContent", name:"ajaxContent", allowHtml:true, url:"http://www.technisode.com/blog/helpContent.html", onContentChanged:"ajaxContentChanged"}</p>
+</blockquote>
+<p>And finally, all together now ...</p>
+<p>index.html</p>
+<blockquote>
+<p>&lt;!doctype html&gt;<br />&lt;html&gt;<br />&lt;head&gt;<br />    &lt;title&gt;technisode example app&lt;/title&gt;<br />    &lt;script src="/dev/enyo/1.0/framework/enyo.js" type="text/javascript"&gt;&lt;/script&gt;<br />&lt;/head&gt;<br />&lt;body&gt;<br />&lt;div id="helpContent"&gt;<br />    &lt;div class="help"&gt;<br />      &lt;div class="topic"&gt;Getting Started&lt;/div&gt;<br />      &lt;div class="content"&gt;<br />        Here is a quick introduction to imported html into you enyo applications.  You can include &lt;a href="http://developer.palm.com"&gt;links to external resources&lt;/a&gt; or other random markup as you need.  Normally, you'd have much more content but this will do for illustration.<br />      &lt;/div&gt;<br />    &lt;/div&gt;<br />&lt;/div&gt;<br />&lt;script type="text/javascript"&gt;<br />    new com.technisode.example.App().renderInto(document.body);<br />&lt;/script&gt;<br />&lt;/body&gt;<br />&lt;/html&gt;</p>
+</blockquote>
+<p>content.js</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {content:<br />            '&lt;div class="help"&gt;' +<br />            '  &lt;div class="topic"&gt;Getting Started&lt;/div&gt;' +<br />            '  &lt;div class="content"&gt;' +<br />            '    Here is a quick introduction to imported html into you enyo applications.  You can include &lt;a href="http://developer.palm.com"&gt;links to external resources&lt;/a&gt; or other random markup as you need.  Normally, you\'d have much more content but this will do for illustration.' +<br />            '  &lt;/div&gt;' +<br />            '&lt;/div&gt;'},<br />        {kind:"HtmlContent", srcId:"helpContent", onLinkClick:"linkClicked"},<br />        {kind:"AjaxContent", name:"ajaxContent", allowHtml:true, url:"http://www.technisode.com/blog/helpContent.html", onContentChanged:"ajaxContentChanged"}<br />    ],<br />    linkClicked:function(sender, url) {<br />        // simple pass-through<br />        window.open(url);<br />    },<br />    ajaxContentChanged:function(sender) {<br />        enyo.asyncMethod(this, function() {<br />            enyo.log("loading complete.  feel free to manipulate the content now", sender.content);<br />            sender.hasNode().querySelectorAll(".topic");  // for example<br />        });<br />    }<br />}<br /><br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Aug 5, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/08/05/enyo-daily-11-animated-grid-layout.html">Enyo Daily #11 - Animated Grid Layout</a>
+        </h2>
+        <p>
+        <p><p>I started this post by looking through the API docs for a control I hadn't used yet.  I came across the Grid control with no documentation and thought to myself, "This could be interesting."  Turns out, not that interesting.  That did lead me to something else however:  an animated grid layout.</p>
+<p>[[MORE]]The Grid control uses simple CSS floats to align its children to a grid.  Each child is assigned the enyo-grid-div class which defines the height and width in pixels (64x48 to be exact).  You can add a custom class (to change the dimensions, for example) to each automatically by specifying a cellClass property on the Grid component.  That's about it.  Oh, you also get a drop shadow ...</p>
+<p>I created something a little more robust.  I'll emphasize little as I haven't tried to consider the various use cases yet.  In short, the extras.Grid control publishes height and width properties that define the size of a cell and absolutely positions each child according to that grid.  I added a quick css transition to animate changes to grid size and voilá.  For a little icing, I also added a collapsed property that when set to true, will collapse all the controls to the top left corner.  So, if you wanted to implement an iOS-style photo stack, you could use this as a starting point.</p>
+<p>I'm going to flesh this out a bit more and will soon add it to my <a href="http://github.com/tiqtech/enyo-extras" target="_blank">enyo extras github repo</a>.  In the mean time, here's the prototype to try out:</p>
+<p><strong>CSS</strong></p>
+<blockquote>.extras-grid {<br />  position:relative<br />}<br />.extras-grid &gt; * {<br />  position:absolute;<br />  -webkit-transition:all 250ms ease-out;<br />}</blockquote>
+<p><strong>JavaScript</strong></p>
+<blockquote>
+<p>var _Grid = {<br />    name:"extras.Grid",<br />    kind:"Control",<br />    className:"extras-grid",<br />    published:{<br />        height:200,<br />        width:150,<br /><br />        collapsed:false<br />    },<br />    create:function() {<br />        this.inherited(arguments);<br />        this.resizeHandler();<br />    },<br />    rendered:function() {<br />        this.inherited(arguments);<br />        if(!this.dim) {<br />            this.resizeHandler();<br />        }<br />    },<br />    // iterates children and repositions them<br />    positionControls:function() {<br />        var c = this.getControls();<br />        for(var i=0;i&lt;c.length;i++) {<br />            this.positionControl(c[i], i);<br />        }<br />    },<br />    // calculates position for a control and applies the style<br />    positionControl:function(control, index) {<br />        var colsPerRow = Math.floor(this.dim.width/this.width)<br />        var top = (this.collapsed) ? 0 : Math.floor(index/colsPerRow)*this.height;<br />        var left = (this.collapsed) ? 0 : (index%colsPerRow)*this.width;<br />        control.applyStyle("top", top + "px");<br />        control.applyStyle("left", left + "px");<br />    },<br />    collapsedChanged:function() {<br />        this.positionControls();<br />    },<br />    widthChanged:function() {<br />        this.positionControls();<br />    },<br />    heightChanged:function() {<br />        this.positionControls();<br />    },<br />    // reflows controls when window.resize event fires (e.g. device rotation)<br />    resizeHandler:function() {<br />        var n = this.hasNode();<br />        if(!n) return;<br /><br />        var s = enyo.dom.getComputedStyle(n);<br />        this.dim = {width:parseInt(s.width),height:parseInt(s.height)};<br />        this.positionControls();<br />    }<br />}<br /><br />enyo.kind(_Grid);<br /><br />var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"extras.Grid",<br />    cellClass:"button",<br />    components:[{kind:"Button", caption:"Collapse", onclick:"toggle"},<br />                {kind:"Button", caption:"Small Grid", onclick:"smallGrid"},<br />                {kind:"Button", caption:"Big Grid", onclick:"bigGrid"},<br />                {kind:"Button", caption:"Normal Grid", onclick:"reset"},<br />                {kind:"Button", caption:"Button 5", onclick:"toggle"},<br />                {kind:"Button", caption:"Button 6", onclick:"toggle"},<br />                {kind:"Button", caption:"Button 7", onclick:"toggle"},<br />                {kind:"Button", caption:"Button 8", onclick:"toggle"},<br />                {kind:"Button", caption:"Button 9", onclick:"toggle"}],<br />    toggle:function() {<br />        this.setCollapsed(!this.getCollapsed());<br />    },<br />    smallGrid:function() {<br />        this.setWidth(96);<br />        this.setHeight(72);<br />    },<br />    bigGrid:function() {<br />        this.setWidth(320);<br />        this.setHeight(240);<br />    },<br />    reset:function() {<br />        this.setWidth(200);<br />        this.setWidth(150);<br />    }<br />}<br /><br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Aug 4, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/08/04/enyo-daily-10-7-line-dashboard-app.html">Enyo Daily #10 - 7 Line Dashboard App</a>
+        </h2>
+        <p>
+        <p>Took a couple days off from this series due to a hackathon event I attended.  After writing code for that many hours, I wasn't up to inventing and composing a blog post.  I did have a chance to build an app using jQuery Mobile so perhaps I'll post about that experience sometime in the future.</p>
+<p>Back on topic, I have been intending to investigate dashboards in Enyo for a while but hadn't found the time.  I'll go deeper in a future post but wanted to share a novelty app I created in 7 lines of code.</p>
+<p>The app doesn't do much, as you might expect in 7 lines of javascript, but it is functional.  To be fair, I'm not counting the boilerplate HTML markup so 7 lines might be a little generous.  Regardless, the app launches directly into a dashboard and increments a counter every time it's clicked.  Exciting, eh?</p>
+<p>Without further ado, here it is!</p>
+<blockquote>
+<p>&lt;!doctype html&gt;<br />&lt;html&gt;<br />&lt;head&gt;<br />    &lt;title&gt;Dashboard&lt;/title&gt;<br />    &lt;script src="/dev/enyo/1.0/framework/enyo.js" type="text/javascript"&gt;&lt;/script&gt;<br />&lt;/head&gt;<br />&lt;body&gt;<br />&lt;script type="text/javascript"&gt;<br />    (function () {<br />        var i = 0, d = enyo.create({kind:"Dashboard", name:"counter"});<br />        d.clickHandler = function() {<br />            d.setLayers([{title:"Click Count",text:"I've been clicked " + (i++) + " times"}]);<br />        }<br />        d.clickHandler();<br />    })();<br />&lt;/script&gt;<br />&lt;/body&gt;<br />&lt;/html&gt;</p>
+</blockquote>
+<p>If you try this at home, be sure to add "noWindow":true to your appinfo.json.</p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Aug 2, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/08/02/enyo-daily-9-stateful.html">Enyo Daily #9 - Stateful</a>
+        </h2>
+        <p>
+        <p><p>I came across this interesting kind while investigating the Picker control.  It's pretty basic -- 1 property and 1 method (+1 protected) -- but can be a useful base class to streamline the styling of a control.</p>
+[[MORE]]
+<p>Stateful's single method is setState() which expects attribute as a string and its state as a boolean.  This method in turn adds or removes a css class with the attribute name as the suffix.  The prefix for the class name is set using the single published property of Stateful -- cssNamespace.  The default cssNamespace is "enyo" but I'd recommend changing it to something unique to your application.</p>
+<p>While you could create a Stateful kind directly, it's designed to be used as a base class.  For example, CustomButton (which is one of the base kinds for the Picker control), publishes several additional properties; each of the changed handlers for these properties call Stateful.setState to style the control appropriate for the change in property value.</p>
+<p>An example will help illustrate.  For a further example, take a look at the source for CustomButton.</p>
+<p><strong>CSS</strong></p>
+<blockquote>
+<p>.extras-active {<br />  background-color:red;<br />}</p>
+</blockquote>
+<p><strong>JavaScript</strong></p>
+<blockquote>
+<p>enyo.kind({<br />  name:"StatefulButton",<br />  kind:"Stateful",<br />  cssNamespace:"extras",<br />  published:{<br />    active:false<br />  },<br />  activeChanged:function() {<br />    this.setState("active", this.active);<br />  },<br />  clickHandler:function() {<br />      this.setActive(!this.active);<br />  }<br />});<br /><br />enyo.kind({<br />  name:"com.technisode.example.App",<br />  kind:"VFlexBox",<br />  components:[<br />    {kind:"StatefulButton", active:true, content:"Button 1"},<br />    {kind:"StatefulButton", active:false, content:"Button 2"},<br />    {kind:"StatefulButton", active:false, content:"Button 3"}<br />  ]<br />});</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Jul 30, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/07/30/enyo-daily-8-events-part-3.html">Enyo Daily #8 - Events - Part 3</a>
+        </h2>
+        <p>
+        <p><p>In the exciting finale on events in enyo, I'll cover the <a href="https://developer.palm.com/content/api/reference/enyo/enyo-api-reference.html#enyo.ApplicationEvents" target="_blank">ApplicationEvents</a> component.  This built-in component handles the three window events (onload, onunload, and resize) as well as a host of webOS specific events.</p>
+<p><em>For more background on events, check out <a href="http://blog.technisode.com/post/8155837364/enyo-daily-6-events-part-1">Part 1 on custom events</a> and <a href="http://blog.technisode.com/post/8203888586/enyo-daily-7-events-part-2">Part 2 on DOM events</a>.</em></p>
+<p><em>[[MORE]]</em>The ApplicationEvents component is really just a convenience control.  It contains virtually no logic.  Instead it simply overrides dispatchDomEvent (<a href="http://blog.technisode.com/post/8203888586/enyo-daily-7-events-part-2">see Part 2 for details</a> on this method) and fires its custom events instead.  Not to say there isn't value using it; it's preferable to declaratively bind a handler via a component versus programmatically checking the event type in dispatchDomEvent.  It also  (hopefully) insulates the developer for changes to the underlying event model.  For example, if HP decided to change an event type, ApplicationEvents would be able to handle that scenario and fire its original event.</p>
+<p>Because there isn't anything to ApplicationEvents, I won't spend much time discussing its features.  One notable event is onWindowRotated.</p>
+<p>As you would expect, this is fired when you rotate the device (or emulator via keystrokes).  Under the covers, this event is really just a translation of the window resize event (Search for enyo.sendOrientationChange in the enyo source to see what's going on).  You'd think that you'd be able to simulate rotation in the browser by reszing the window.  Unfortunately, there's check for changes to PalmSystem.screenOrientation (which I assume is set by Palm's customized WebKit since it isn't referenced elsewhere in source) so windowRotated never fires in the browser.</p>
+<p>If you want to test how your display will scale when changing from portrait to landscape, you can add a resizeHandler method to your component (<a href="http://blog.technisode.com/post/8203888586/enyo-daily-7-events-part-2">check out Part 2</a> for an explanation why you don't have to specifically listen for resize for resizeHandler to be called).  If, however, you need to test for a specific orientation, you'll have to use the emulator.</p>
+<p>Here's the complete example incorporating all three types of events.</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"ApplicationEvents", name:"appEvents"},<br />        {kind:"EventSender", name:"eventSender", onSend:"sent"},<br />        {kind:"Button", onclick:"clicked"},<br />        {kind:"Input", onkeypress:"press"}<br />    ],<br />    create:function() {<br />        this.inherited(arguments);<br />        <br />        // map all ApplicationEvents to logAppEvent<br />        var ae = this.$.appEvents;<br />        Object.keys(enyo.ApplicationEvents.prototype.events).forEach(function(key) {<br />            enyo.log("setting handler for ",key);<br />            ae[key] = "logAppEvent";<br />        })<br />    },<br />    logAppEvent:function(source, e) {<br />        enyo.log("logAppEvent",e.type);<br />    },<br />    resizeHandler:function() {<br />        enyo.log("dimensions",window.document.body.offsetWidth,window.document.body.offsetHeight);<br />    },<br />    captureDomEvent:function(e) {<br />        enyo.log("A DOM event occured", e.type);<br />        <br />        // returning true would indicated the event is captured and prevent the bubble phase<br />        // thereby preventing the declared handlers (clicked in this case) from being called<br />        <br />        // returning false (or no explicit return) lets things continue<br />        return false;<br />    },<br />    dispatchDomEvent:function(e) {<br />        // like any other method, you could override dispatchDomEvent and implement custom routing<br />        e.myCustomField = "This is a custom field";<br />        <br />        return this.inherited(arguments);<br />    },<br />    press:function(source, event) {<br />        enyo.log(source, event);<br />    },<br />    clickHandler:function(source, event) {<br />        enyo.log("bubbled up to me", event.myCustomField);<br />        <br />        // calling event.stopPropagation() or returning true will end the bubble phase<br />    },<br />    clicked:function(source, event) {<br />        // trigger my custom events<br />        this.$.eventSender.go();<br />        <br />        // toggles event handler between send and secondSent ... just because ...<br />        this.$.eventSender.onSend = (this.$.eventSender.onSend === "sent") ? "secondSent" : "sent";<br />        <br />        // calling event.stopPropagation() or returning true will end the bubble phase<br />    },<br />    sent:function(source, one, two, three) {<br />        enyo.log("sent", one, two, three)<br />    },<br />    handleOnAlert:function(source, obj) {<br />        enyo.log("alerted", enyo.json.stringify(obj));<br />    },<br />    secondSent:function(source, one, two, three) {<br />        enyo.log("secondSent handles onSend now", one, two, three)<br />    }<br />}<br /><br />var _EventSender = {<br />    name:"EventSender",<br />    kind:"Component",<br />    events:{ <br />        onSend:"handleOnSend",<br />        onAlert:{value:"handleOnAlert", caller:"sendAlert"}<br />    },<br />    go:function() {<br />        this.doSend(1,2,3);    // dispatchIndirectly<br />        this.sendAlert({a:1, b:2});<br />    }<br />}<br /><br />enyo.kind(_EventSender);<br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Jul 29, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/07/29/enyo-daily-7-events-part-2.html">Enyo Daily #7 - Events - Part 2</a>
+        </h2>
+        <p>
+        <p><p>In<a href="http://blog.technisode.com/post/8155837364/enyo-daily-6-events-part-1"> Part 1 about Events</a> in enyo, I covered defining, triggering, and reacting to custom events for enyo Components.  The other source is DOM events triggered by user interactions or window changes.[[MORE]]</p>
+<p>First off, here are the supported DOM events in enyo:</p>
+<blockquote>
+<p><strong>Document Events</strong><br />mousedown, mouseup, mouseover, mouseout, mousemove, click, dblclick, change, keydown, keyup, keypress, input</p>
+<p><strong>Window Events</strong><br />resize, load, unload</p>
+</blockquote>
+<p>There are two phases to DOM event handling in enyo:  capture and bubble.  The capture phase starts with the eldest ancestor, calls captureDomEvent (if found), and continues downt the hierarchy until a captureDomEvent call returns true or reaches the source Control of the event.</p>
+<p>If nothing captures the event, it's passed to the bubble phase.  This phase traverses the opposite direction -- from node to parent.  Again, if an event handler (dispatchDomEvent in the bubble phase) returns true, the phase stops; otherwise it continues until it reaches the top of the DOM tree.  Also, if stopPropagation() is called on the event object, the phase will end as well.</p>
+<p>Unlike the capture phase where you must implement captureDomEvent to handle the event, enyo.Component implements dispatchDomEvent and provides some basic routing.  It first looks for a method matching the signature eventtypeHandler (e.g. clickHandler).  If not found, it will look for an oneventtype (e.g. onclick) declaration and dispatch the event to it.  Note that these handlers are mutually exclusive; if the first is found, the second will not be called.</p>
+<p>Below is a slightly expanded example from the previous part that includes DOM event capturing and bubbling.  If you try this code out, you can add different return values to see when events are stopped in each phase.</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"EventSender", name:"eventSender", onSend:"sent"},<br />        {kind:"Button", onclick:"clicked"},<br />        {kind:"Input", onkeypress:"press"}<br />    ],<br />    captureDomEvent:function(e) {<br />        enyo.log("A DOM event occured", e.type);<br />        <br />        // returning true would indicated the event is captured and prevent the bubble phase<br />        // thereby preventing the declared handlers (clicked in this case) from being called<br />        <br />        // returning false (or no explicit return) lets things continue<br />        return false;<br />    },<br />    dispatchDomEvent:function(e) {<br />        // like any other method, you could override dispatchDomEvent and implement custom routing<br />        e.myCustomField = "This is a custom field";<br />        <br />        return this.inherited(arguments);<br />    },<br />    press:function(source, event) {<br />        enyo.log(source, event);<br />    },<br />    clickHandler:function(source, event) {<br />        enyo.log("bubbled up to me", event.myCustomField);<br />        <br />        // calling event.stopPropagation() or returning true will end the bubble phase<br />    },<br />    clicked:function(source, event) {<br />        // trigger my custom events<br />        this.$.eventSender.go();<br />        <br />        // toggles event handler between send and secondSent ... just because ...<br />        this.$.eventSender.onSend = (this.$.eventSender.onSend === "sent") ? "secondSent" : "sent";<br />        <br />        // calling event.stopPropagation() or returning true will end the bubble phase<br />    },<br />    sent:function(source, one, two, three) {<br />        enyo.log("sent", one, two, three)<br />    },<br />    handleOnAlert:function(source, obj) {<br />        enyo.log("alerted", enyo.json.stringify(obj));<br />    },<br />    secondSent:function(source, one, two, three) {<br />        enyo.log("secondSent handles onSend now", one, two, three)<br />    }<br />}<br /><br />var _EventSender = {<br />    name:"EventSender",<br />    kind:"Component",<br />    events:{ <br />        onSend:"handleOnSend",<br />        onAlert:{value:"handleOnAlert", caller:"sendAlert"}<br />    },<br />    go:function() {<br />        this.doSend(1,2,3);    // dispatchIndirectly<br />        this.sendAlert({a:1, b:2});<br />    }<br />}<br /><br />enyo.kind(_EventSender);<br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+  </ul>
+
+  
+  
+  <div class="pagination">
+    
+      <a href="/blog/page3">&laquo; Prev</a>
+    
+
+    
+      
+        <a href="/blog/page3">1</a>
+      
+    
+      
+        <a href="/blog/page2">2</a>
+      
+    
+      
+        <a href="/blog/page3">3</a>
+      
+    
+      
+        <em>4</em>
+      
+    
+      
+        <a href="/blog/page5">5</a>
+      
+    
+
+    
+      <a href="/blog/page5">Next &raquo;</a>
+    
+  </div>
+  
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Thoughts on JS</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Thoughts on JS</li>
+          <li><a href="mailto:ryan@tiqtech.com">ryan@tiqtech.com</a></li>
+          <li><a href="/blog/feed.xml">RSS</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/ryanjduffy"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">ryanjduffy</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/theryanjduffy"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">theryanjduffy</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Sharing thoughts, discoveries, and questions while supporting and developing JavaScript applications.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Thoughts on JS</title>
+  <meta name="description" content="Sharing thoughts, discoveries, and questions while supporting and developing JavaScript applications.
+">
+
+  <link rel="stylesheet" href="/blog/css/main.css">
+  <link rel="canonical" href="//ryanjduffy.github.io/blog/page3/">
+  <link rel="alternate" type="application/rss+xml" title="Thoughts on JS" href="//feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/blog/">Thoughts on JS</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/blog/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <div class="home">
+  
+  <h1 class="page-heading">Posts</h1>
+
+  
+  
+  <div class="pagination">
+    
+      <a href="/blog/page2">&laquo; Prev</a>
+    
+
+    
+      
+        <a href="/blog/page2">1</a>
+      
+    
+      
+        <a href="/blog/page2">2</a>
+      
+    
+      
+        <em>3</em>
+      
+    
+      
+        <a href="/blog/page4">4</a>
+      
+    
+      
+        <a href="/blog/page5">5</a>
+      
+    
+
+    
+      <a href="/blog/page4">Next &raquo;</a>
+    
+  </div>
+  
+
+
+  <ul class="post-list">
+    
+      <li>
+        <span class="post-meta">Jul 7, 2012</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2012/07/07/enyo-daily-23-memorable-panels.html">Enyo Daily #23 - Memorable Panels</a>
+        </h2>
+        <p>
+        <p>This is very much beta code but wanted to share how to add history to the Enyo2 Panels control.  For flavor, I even added html5 history support so if you're using a Panels controls as the main view controller (like Pane in Enyo1), you get quick back button support.</p>
+
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Jul 1, 2012</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2012/07/01/enyo-daily-22-always-focused-inputs.html">Enyo Daily #22 - Always Focused Inputs </a>
+        </h2>
+        <p>
+        <p><p>In enyo v1, making an input control appear focused was easy: simply set alwaysLooksFocused to true.  In enyo v2, the styling is delegated to an InputDecorator but it doesn't provide this same property.  Fortunately, it's easy to add to a custom subkind.</p>
+
+<pre><code>enyo.kind({
+
+	name:"extras.InputDecorator",
+
+	kind:"onyx.InputDecorator",
+
+	published:{
+
+		alwaysLooksFocused:false,
+
+	},
+
+	create:function() {
+
+		this.inherited(arguments);
+
+		this.alwaysLooksFocusedChanged();
+
+	},
+
+	alwaysLooksFocusedChanged:function() {
+
+		this.addRemoveClass("onyx-focused", this.alwaysLooksFocused);
+
+	},
+
+	receiveBlur:function() {
+
+		if(!this.alwaysLooksFocused) {
+
+			this.inherited(arguments);
+
+		}
+
+	}
+
+});</code></pre></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">May 18, 2012</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2012/05/18/enyo-daily-20-frankenstein-and-enyo.html">Enyo Daily #20 - Frankenstein and Enyo</a>
+        </h2>
+        <p>
+        <p><p>CSS transitions are a really easy way to add basic animation to an enyo app.  It works on (seemingly) any CSS property and takes JavaScript out of the picture.   With Pirate's Dice (which is still not fully functional ...), I'm using them to zoom the background when starting a new game.  I'm also trying to support multiple resolutions (phones in portrait and landscape, tablets, and desktop) using media queries.[[MORE]]</p>
+
+<p>To accomplish this, I'm scaling the background image differently for smaller screens than larger.</p>
+
+<pre><code>
+
+.animate {
+    -webkit-transition:all 500ms ease-out;
+}
+
+/* portrait */
+
+.app {
+    background:#3e140c url(../image/bg.png) no-repeat 50% 100%;
+    -webkit-background-size:auto 100%;
+}
+
+.app.new-game {
+    -webkit-background-size:auto 200%;
+}
+
+/* landscape */
+.app {
+    -webkit-background-size:100% auto;
+}
+
+.app.new-game {
+    -webkit-background-size:200% auto;
+}
+</code></pre>
+<p>The consequence of this was that changing orientations of the phone would cause WebKit to animate the width from 100% to auto along with the height from auto to 100%.  This turns out to be a rather jarring experience.  To avoid this, I added a sprinkle of script to the resize handler that removes the animate class when resize starts and readds it once its complete.  enyo.job does the work of ensuring reanimate only runs once.  In other words, it won't be constantly added and readded as the window is resized such as on a desktop browser.</p>
+
+<pre><code class="javascript">
+resizeHandler:function() {
+    this.removeClass(“animate”);
+    enyo.job(“frankenstein”, enyo.bind(this, “reanimate”), 200);
+},
+reanimate:function() {
+    this.addClass(“animate”);
+}
+</code></pre></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">May 6, 2012</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2012/05/06/enyo-daily-21-enyo-style-tag.html">Enyo Daily #21 - Enyo Style Tag</a>
+        </h2>
+        <p>
+        <p>Had a random idea to implement a &lt;style&gt; tag in Enyo for global runtime CSS manipulation.  I'm thinking it might be handy to resize a bunch of elements as a result of window resize, for example.  I wrote a quick example in enyo v1 and ported the couple differences for v2.</p>
+<p>You can either set the entire CSS via its published css property or set individual blocks via the set(classSpec, styleObject) method.</p>
+<p>Thoughts?</p>
+<p><em>Edit:</em> Make a quick update to enable removing CSS from a selector by passing a null.  See the example below for removing the border from the children of .app.</p>
+<p>Here it is live:</p>
+<p><iframe frameborder="0" height="400px" src="http://jsfiddle.net/ryanjduffy/KAT2Z/2/embedded/"></iframe></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Feb 22, 2012</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2012/02/22/enyo-daily-19-local-scrims.html">Enyo Daily #19 - Local Scrims</a>
+        </h2>
+        <p>
+        <p><p>There are two ways to create a scrim in enyo: globally through enyo.scrim or through the enyo.Scrim kind.  In either case, the scrim "fades" the entire view (usually in order to show a modal dialog or a spinner).  Another use case I'm currently experimenting with in Pirate's Dice is a local scrim -- one that only fades a particular portion of the app.</p>
+<p>[[MORE]]In my case, I'm using a scrim to disable the bid controls while other players are active.  I've tried a few different approaches (including drawers, dialogs, and hiding the controls) but a scrim seems to be a nice and simple way to handle it.</p>
+<p>Making a scrim local is quite easy and mostly relies on a quick CSS customization.  First, create an instance of enyo.Scrim as a child of the control you wish to fade.</p>
+
+<blockquote>
+<p>enyo.kind({<br /><span> </span>name:"ex.Hideable",<br /><span> </span>kind:"Control",<br /><span> </span>className:"extras-hideable",<br /><span> </span>components:[<br /><span> </span>{name:"count", content:"Click Count: 0"},<br /><span> </span>{kind:"Button", onclick:"clicked"},<br /><span> </span>{name:"scrim", kind:"Scrim"}<br /><span> </span>],<br />});</p>
+</blockquote>
+<p>Notice I declared a className for the Control.  Next, I'll use that class name in css to limit the scrim to the bounds of my Hideable control.  By default, a scrim covers the screen by settings its position attribute to fixed.  To make it local, simply set the position of the parent control to relative and the scrim to absolute and you're set!</p>
+
+<blockquote>
+<p>.extras-hideable {<br /><span> </span>position:relative;<br />}<br />.extras-hideable .enyo-scrim {<br /><span> </span>position:absolute;<br />}</p>
+</blockquote>
+
+<p>Finally, to show or hide the scrim, call the appropriate method on the scrim instance.  To illustrate, here's a silly example but it get's the point across.  Clicking on the button increments the count and changes the label.  Once the scrim is active (by clicking anywhere else in the control), clicking the button is blocked by the scrim.</p>
+<blockquote>
+<p>enyo.kind({<br /><span> </span>name:"ex.Hideable",<br /><span> </span>kind:"Control",<br /><span> </span>className:"extras-hideable",<br /><span> </span>components:[<br /><span> </span>{name:"count", content:"Click Count: 0"},<br /><span> </span>{kind:"Button", onclick:"clicked"},<br /><span> </span>{name:"scrim", kind:"Scrim"}<br /><span> </span>],<br /><span> </span>create:function() {<br /><span> </span>this.inherited(arguments);<br /><span> </span>this.showing = false;<br /><span> </span>this.count = 0;<br /><span> </span>},<br /><span> </span>toggle:function() {<br /><span> </span>this.$.scrim[this.showing ? "hide" : "show"]();<br /><span> </span>this.showing = !this.showing;<br /><span> </span>},<br /><span> </span>clicked:function(source, event) {<br /><span> </span>this.count++;<br /><span> </span>this.$.count.setContent("Click Count: " + this.count);<br /><span> <br /></span><span> </span>event.stopPropagation();</p>
+<p><span> </span>}<br />});<br /><br />enyo.kind({<br /><span> </span> name:"ex.App",<br /><span> </span> kind:"VFlexBox",<br /><span> </span> components:[<br /><span> </span>{kind:"ex.Hideable", flex:1, onclick:"toggle"},<br /><span> </span>{kind:"ex.Hideable", flex:1, onclick:"toggle"},<br /><span> </span>{kind:"ex.Hideable", flex:1, onclick:"toggle"},<br /><span> </span>{kind:"ex.Hideable", flex:1, onclick:"toggle"}<br /><span> </span>],<br /><span> </span>lastRow:null,<br /><span> </span>toggle:function(source) {<br /><span> </span>if(source === this.lastRow) return;<br /><span> </span>if(this.lastRow) {<br /><span> </span>this.lastRow.toggle();<br /><span> </span>}<br /><span> </span>source.toggle();<br /><span> </span>this.lastRow = source;<br /><span> </span>},<br />});<br /><br />new ex.App().renderInto(document.body);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Feb 21, 2012</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2012/02/21/pirate-s-dice.html">Pirate's Dice</a>
+        </h2>
+        <p>
+        <p>Working on a new game for webOS (and possibly other platforms) called Pirate's Dice.  I'm hoping to support both the classic rules of <a href="http://en.wikipedia.org/wiki/Liar%27s_dice">Liar's Dice</a> as well a variation or two.  I have a playable alpha build working and am working on polish.  I'll be looking for beta testers soon I hope so let me know in comments or via email [admin-at-tiqtech.com] if you're interested.</p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Jan 26, 2012</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2012/01/26/extras-accordion.html">extras.Accordion</a>
+        </h2>
+        <p>
+        <p>Created a new Accordion control this evening in my <a href="http://github.com/tiqtech/enyo-extras">enyo-extras repository</a>.  If you're not familiar with this style control, jQuery has a <a href="http://jqueryui.com/demos/accordion/">similar example</a>.  Take a look and feel free to fork and make improvements!</p>
+<p>Next iteration will support scrolling content and horizontal display.</p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Oct 14, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/10/14/enyo-daily-18-dynamic-depends-js.html">Enyo Daily #18 - Dynamic depends.js </a>
+        </h2>
+        <p>
+        <p><p><em>While it's probably not fair to call this "daily" any longer, I'm going to stick with it anyway.</em></p>
+<p>You may have heard that <a href="http://www.precentral.net/bing-maps-update-brings-enyo-support-webos-masses">enyo has found its way onto the legacy</a> devices via a <a href="http://blog.palm.com/palm/2011/10/a-new-view-of-the-world.html">new Maps application</a> in the App Catalog.  To test things out, I tried to deploy <a href="http://bit.ly/scorekeeper">Score Keeper</a> onto my Pre2.  It deploys successfully but there are definitely some bugs to sort out.  One way I intend to clean up the UI is by including a phone-specific stylesheet through a dynamic depends.js file.</p>
+[[MORE]]
+<p>The normal depends.js file looks something like this:</p>
+<blockquote>
+<p>enyo.depends(<br />    "controls.js",<br />    "app.js",<br />    "app.css"<br />);</p>
+</blockquote>
+<p>This tells enyo to load up controls.js, app.js, and app.css in the same directory as this depends.js file.  But depends.js is just a regular javascript file so there's nothing preventing you from doing something a little more robust here to select which files you want to include.  Also, since the framework is the one including depends.js in the first place, all the framework functions are available during execution of depends.js.</p>
+<p>I elected to use a closure to keep the global namespace clear and base my custom CSS inclusion on the screen width.  If you're aware of a better condition to check, please share in the comments.  Inside the function, I retrieve the device info and build an array of the common files.  Next, I check the device width and push the extra css if appropriate.  Finally, I call enyo.depends (via Function.apply since I'm working with an array) and that's all!</p>
+<blockquote>
+<p>(function() {<br />    var di = enyo.fetchDeviceInfo();<br />    <br />    var paths = ["extras.js",<br />                 "views.js",<br />                 "app.css"];<br />    <br />    if(di &amp;&amp; di.screenWidth &lt; 500) {<br />        paths.push("app-phone.css");<br />    }<br />    <br />    enyo.depends.apply(enyo, paths);<br />})();</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Sep 19, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/09/19/enyo-daily-17-events-part-5.html">Enyo Daily #17 - Events - Part 5</a>
+        </h2>
+        <p>
+        <p><p>I wouldn't have expected to write so much about events in enyo but there's a lot of depth to cover.  I previously posted about an <a href="http://blog.technisode.com/post/8545758113/enyo-daily-11-animated-grid-layout">Animated Grid Layout</a> control I created which I later used in <a href="http://developer.palm.com/appredirect/?packageid=com.tiqtech.scorekeeper">Score Keeper</a> for the board selection.  I have a similar requirement for the main panes of <a href="http://developer.palm.com/appredirect/?packageid=com.tiqtech.incontact">InContact </a>but also need to reorder the items.[[MORE]]</p>
+<p>To enable the reordering, I wanted to defer the event handling to the new grid control rather than binding them in my app.  This keeps that logic contained to a separate control (one I could swap out for an alternate grid control if desired) and not muddling up my main app code.  The rub with this is that is was difficult to add an event handler to an enyo instance when you're not the owner of the control (in my scenario, the main app is the owner whereas the grid is just the container.  More on ownership and containment in <a href="http://blog.technisode.com/post/7941076324/enyo-daily-3-ownership">Enyo Daily 3</a>).</p>
+<p>The rather simple solution I discovered was to add an instance function to the enyo instance during creation.  The function is bound (using enyo.bind) to the grid control so it can enable reordering.</p>
+<p>One caution with this approach is that it will by default prevent calling a handler declared for the onX event for the instance.  You could call dispatchIndirectly yourself in your instance method but I'll leave that as homework.  :)</p>
+<p>Here's a quick example.  I'll share the reorderable grid control once it's actually complete!</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"ApplicationEvents", name:"appEvents", onUnload:"logAppEvent"},<br />        {kind:"EventSender", name:"eventSender", onSend:"sent"},<br />        {kind:"Button", onclick:"clicked"},<br />        {kind:"ContainerListener", components:[<br />            {kind:"Button", caption:"Clicking me will be handled by my container"}<br />        ]},<br />        {kind:"Input", onkeypress:"press"},<br />        {kind:"Dashboard", name:"db"}<br />    ],<br />    create:function() {<br />        this.inherited(arguments);<br />        <br />        this.$.db.setLayers([{title:"My Dashboard", text:"important message"}]);<br />        <br />        // map all ApplicationEvents to logAppEvent<br />        var ae = this.$.appEvents;<br />        Object.keys(enyo.ApplicationEvents.prototype.events).forEach(function(key) {<br />            //enyo.log("setting handler for ",key);<br />            ae[key] = "logAppEvent";<br />        });<br />        <br />        enyo.dispatcher.rootHandler.addListener(this);<br />    },<br />    logAppEvent:function(source, e) {<br />        enyo.log("logAppEvent",e.type);<br />    },<br />    resizeHandler:function() {<br />        enyo.log("dimensions",window.document.body.offsetWidth,window.document.body.offsetHeight);<br />    },<br />    captureDomEvent:function(e) {<br />        enyo.log("A DOM event occured", e.type);<br />        <br />        // returning true would indicated the event is captured and prevent the bubble phase<br />        // thereby preventing the declared handlers (clicked in this case) from being called<br />        <br />        // returning false (or no explicit return) lets things continue<br />        return false;<br />    },<br />    dispatchDomEvent:function(e) {<br />        // like any other method, you could override dispatchDomEvent and implement custom routing<br />        e.myCustomField = "This is a custom field";<br />        <br />        return this.inherited(arguments);<br />    },<br />    press:function(source, event) {<br />        enyo.log(source, event);<br />    },<br />    clickHandler:function(source, event) {<br />        enyo.log("bubbled up to me", event.myCustomField);<br />        <br />        // calling event.stopPropagation() or returning true will end the bubble phase<br />    },<br />    clicked:function(source, event) {<br />        // trigger my custom events<br />        this.$.eventSender.go();<br />        <br />        // toggles event handler between send and secondSent ... just because ...<br />        this.$.eventSender.onSend = (this.$.eventSender.onSend === "sent") ? "secondSent" : "sent";<br />        <br />        // calling event.stopPropagation() or returning true will end the bubble phase<br />    },<br />    sent:function(source, one, two, three) {<br />        enyo.log("sent", one, two, three)<br />    },<br />    handleOnAlert:function(source, obj) {<br />        enyo.log("alerted", enyo.json.stringify(obj));<br />    },<br />    secondSent:function(source, one, two, three) {<br />        enyo.log("secondSent handles onSend now", one, two, three)<br />    },<br />    customGlobalEventHandler:function(sender, param) {<br />        enyo.log("customGlobalEvent", param.data);<br />    }<br />}<br /><br />var _ContainerListener = {<br />    name:"ContainerListener",<br />    kind:"Control",<br />    createComponent:function() {<br />        var o = this.inherited(arguments);<br />        o.clickHandler = enyo.bind(this, "childClicked");<br />        return o;<br />    },<br />    childClicked:function(source, event) {<br />        enyo.log("one of my child nodes was clicked!")<br />    }<br />}<br /><br />var _EventSender = {<br />    name:"EventSender",<br />    kind:"Component",<br />    events:{ <br />        onSend:"handleOnSend",<br />        onAlert:{value:"handleOnAlert", caller:"sendAlert"}<br />    },<br />    create:function() {<br />        this.inherited(arguments);<br />        <br />        enyo.dispatcher.rootHandler.addListener(this);<br />    },<br />    go:function() {<br />        this.doSend(1,2,3);    // dispatchIndirectly<br />        this.sendAlert({a:1, b:2});<br />        window.enyo.dispatch({type:"customGlobalEvent", data:"something to pass"});<br />    },<br />    customGlobalEventHandler:function(sender, e) {<br />        enyo.log("also caught customGlobalEvent");<br />    }<br />}<br /><br />enyo.kind(_ContainerListener);<br />enyo.kind(_EventSender);<br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
+        <span class="post-meta">Sep 13, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/09/13/scorekeeper.html">Scorekeeper</a>
+        </h2>
+        <p>
+        <p><strong>Score Keeper</strong></p>
+<p>Had to take some time away from my Enyo Daily series to actually finish up my first Touchpad app!!  It's called Score Keeper and, as the name implies, it helps you keep track of the score for a game or activity.  I just submitted it to the catalog and should be available soon.  You'll find it <a target="_blank" href="http://developer.palm.com/appredirect/?packageid=com.tiqtech.scorekeeper">here </a>once it's available.</p>
+
+        </p>
+      </li>
+    
+  </ul>
+
+  
+  
+  <div class="pagination">
+    
+      <a href="/blog/page2">&laquo; Prev</a>
+    
+
+    
+      
+        <a href="/blog/page2">1</a>
+      
+    
+      
+        <a href="/blog/page2">2</a>
+      
+    
+      
+        <em>3</em>
+      
+    
+      
+        <a href="/blog/page4">4</a>
+      
+    
+      
+        <a href="/blog/page5">5</a>
+      
+    
+
+    
+      <a href="/blog/page4">Next &raquo;</a>
+    
+  </div>
+  
+
+</div>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Thoughts on JS</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>Thoughts on JS</li>
+          <li><a href="mailto:ryan@tiqtech.com">ryan@tiqtech.com</a></li>
+          <li><a href="/blog/feed.xml">RSS</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/ryanjduffy"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">ryanjduffy</span></a>
+
+          </li>
+          
+
+          
+          <li>
+            <a href="https://twitter.com/theryanjduffy"><span class="icon icon--twitter"><svg viewBox="0 0 16 16"><path fill="#828282" d="M15.969,3.058c-0.586,0.26-1.217,0.436-1.878,0.515c0.675-0.405,1.194-1.045,1.438-1.809c-0.632,0.375-1.332,0.647-2.076,0.793c-0.596-0.636-1.446-1.033-2.387-1.033c-1.806,0-3.27,1.464-3.27,3.27 c0,0.256,0.029,0.506,0.085,0.745C5.163,5.404,2.753,4.102,1.14,2.124C0.859,2.607,0.698,3.168,0.698,3.767 c0,1.134,0.577,2.135,1.455,2.722C1.616,6.472,1.112,6.325,0.671,6.08c0,0.014,0,0.027,0,0.041c0,1.584,1.127,2.906,2.623,3.206 C3.02,9.402,2.731,9.442,2.433,9.442c-0.211,0-0.416-0.021-0.615-0.059c0.416,1.299,1.624,2.245,3.055,2.271 c-1.119,0.877-2.529,1.4-4.061,1.4c-0.264,0-0.524-0.015-0.78-0.046c1.447,0.928,3.166,1.469,5.013,1.469 c6.015,0,9.304-4.983,9.304-9.304c0-0.142-0.003-0.283-0.009-0.423C14.976,4.29,15.531,3.714,15.969,3.058z"/></svg>
+</span><span class="username">theryanjduffy</span></a>
+
+          </li>
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Sharing thoughts, discoveries, and questions while supporting and developing JavaScript applications.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>

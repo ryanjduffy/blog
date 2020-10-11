@@ -6,9 +6,20 @@
 </description>
     <link>https://ryanjduffy.github.io/blog/</link>
     <atom:link href="ryanjduffy.github.io/blog/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 12 Sep 2020 21:35:50 -0700</pubDate>
-    <lastBuildDate>Sat, 12 Sep 2020 21:35:50 -0700</lastBuildDate>
+    <pubDate>Sun, 11 Oct 2020 16:41:41 -0700</pubDate>
+    <lastBuildDate>Sun, 11 Oct 2020 16:41:41 -0700</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
+    
+      <item>
+        <title>React Hook Migration Strategy</title>
+        <description>
+</description>
+        <pubDate>Sat, 26 Sep 2020 11:44:00 -0700</pubDate>
+        <link>https://ryanjduffy.github.io/blog/2020/09/26/react-hook-migration-strategy.html</link>
+        <guid isPermaLink="true">https://ryanjduffy.github.io/blog/2020/09/26/react-hook-migration-strategy.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>Rust + WASM: Seeding the Game of Life</title>
@@ -1154,113 +1165,6 @@ git commit -m 'add new feature'
         <pubDate>Mon, 25 Jul 2016 00:00:00 -0700</pubDate>
         <link>https://ryanjduffy.github.io/blog/2016/07/25/squashing-commit-histories.html</link>
         <guid isPermaLink="true">https://ryanjduffy.github.io/blog/2016/07/25/squashing-commit-histories.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Including Git History in a Jekyll Post</title>
-        <description>&lt;p&gt;Now that I’ve bought into a Jekyll-based blog running on GitHub Pages, the next step was to surface
-the revision history for a post at the bottom so readers can easily see when and what was updated.&lt;/p&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2 id=&quot;retrieving-the-history&quot;&gt;Retrieving the History&lt;/h2&gt;
-
-&lt;p&gt;I had a couple thoughts on how I might get the git history onto the post. My first instinct was to
-find a plugin for Jekyll to do the trick. I found, however, that &lt;a href=&quot;http://jekyllrb.com/docs/plugins/&quot;&gt;GitHub doesn’t support custom
-Jekyll plugins&lt;/a&gt; on deployment so that wouldn’t work. I also
-briefly considered a commit hook which I think would work but was quickly interrupted by a better
-idea: &lt;a href=&quot;https://developer.github.com/v3/&quot;&gt;GitHub’s JSON API&lt;/a&gt;!&lt;/p&gt;
-
-&lt;p&gt;The relevant endpoint is the &lt;a href=&quot;https://developer.github.com/v3/repos/commits/&quot;&gt;commits&lt;/a&gt; for the repo
-of interest. By default, this will give you the commits for the entire repository but can be
-filtered by path which is exactly what I needed.&lt;/p&gt;
-
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;GET /repos/:owner/:repo/commits?path=/_posts/post-name.md
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Creating that URL in Jekyll requires stitching together a couple variables from the site’s
-&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_config.yml&lt;/code&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;language-liquid highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;https://api.github.com/repos/&lt;span class=&quot;p&quot;&gt;{{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;site&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;github_username&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}}{{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;site&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;baseurl&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}}&lt;/span&gt;/commits?path=&lt;span class=&quot;p&quot;&gt;{{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;page&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;In my case, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;site.baseurl&lt;/code&gt; was the repository name prepended by a slash. If you have a custom
-domain in place, you may need to alter that to your needs.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;fetching-via-js&quot;&gt;Fetching via JS&lt;/h2&gt;
-
-&lt;p&gt;With the URL built, I’m ready to write up the JS to fetch it and inject it into the DOM. I’ll admit
-that my pure XHR skills have rusted a bit but I didn’t want to introduce a library and the refresher
-was good.&lt;/p&gt;
-
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;https://api.github.com/repos/ryanjduffy/blog//commits?path=_posts/2016-01-08-including-git-history-in-a-jekyll-post.md&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-		&lt;span class=&quot;nx&quot;&gt;xhr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;XMLHttpRequest&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-	&lt;span class=&quot;nx&quot;&gt;xhr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;GET&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-	&lt;span class=&quot;nx&quot;&gt;xhr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-	&lt;span class=&quot;nx&quot;&gt;xhr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;onreadystatechange&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;commits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-		&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;xhr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;readyState&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;xhr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;status&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;200&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-
-		&lt;span class=&quot;nx&quot;&gt;commits&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;JSON&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;xhr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;responseText&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-		&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;commits&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;commits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;c1&quot;&gt;// create the DOM nodes&lt;/span&gt;
-		&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-	&lt;span class=&quot;p&quot;&gt;};&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;})();&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;into-the-dom&quot;&gt;Into the DOM&lt;/h2&gt;
-
-&lt;p&gt;I elected for simple string concatenation to build the inner HTML. The UI is loosely based on the
-commit history UI from GitHub. I’ve simplified it to only show the authorship and the first line of
-the commit message which links to the commit on GitHub for the curious. Keeping with the relative
-time used on GitHub, I pulled in &lt;a href=&quot;http://momentjs.com&quot;&gt;moment.js&lt;/a&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;html&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;commits&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;map&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;author&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;author&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-		&lt;span class=&quot;nx&quot;&gt;avatar&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;author&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;avatar_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
-		&lt;span class=&quot;nx&quot;&gt;date&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;moment&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;author&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fromNow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(),&lt;/span&gt;
-		&lt;span class=&quot;nx&quot;&gt;message&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;split&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;],&lt;/span&gt;
-		&lt;span class=&quot;nx&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;html_url&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-	
-	&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;lt;div class=&quot;history-entry&quot;&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;
-				&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;lt;img src=&quot;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;avatar&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&quot;&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;
-				&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;lt;a href=&quot;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;url&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&quot; target=&quot;gh-history&quot;&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;message&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;lt;/a&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;
-				&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;lt;span&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;author&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt; updated this &lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;date&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;toLocaleString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;lt;/span&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; 
-			&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Though it’s unlikely to catch me, I decided to santize the author’s name and commit message to avoid
-any markup that might be there from breaking the UI. Borrowed some [code from SO]
-(http://stackoverflow.com/questions/1219860/html-encoding-in-javascript-jquery) and away we go.
-Finally, we’ll inject that HTML into the DOM. To guard against network/JS failures, the target is
-initially hidden and only shown when the HTML has been generated.&lt;/p&gt;
-
-&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;post_history&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;post-history&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;style=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;display: none&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-	&lt;span class=&quot;nt&quot;&gt;&amp;lt;h3&amp;gt;&lt;/span&gt;Revisions&lt;span class=&quot;nt&quot;&gt;&amp;lt;/h3&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;post_history&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;post_history&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;post_history&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;innerHTML&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;html&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;nx&quot;&gt;post_history&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;display&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;block&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;I’m pretty happy with the result and I think it’ll give good visibility into the post. You can see
-the &lt;a href=&quot;https://github.com/ryanjduffy/blog/blob/gh-pages/_includes/history.html&quot;&gt;most recent code&lt;/a&gt; for
-the include on GitHub. Questions/Comments below or open a PR with a change and see yourself in a
-post showing how it’s possible to see yourself!&lt;/p&gt;
-</description>
-        <pubDate>Fri, 08 Jan 2016 00:00:00 -0800</pubDate>
-        <link>https://ryanjduffy.github.io/blog/2016/01/08/including-git-history-in-a-jekyll-post.html</link>
-        <guid isPermaLink="true">https://ryanjduffy.github.io/blog/2016/01/08/including-git-history-in-a-jekyll-post.html</guid>
         
         
       </item>

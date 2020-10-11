@@ -108,6 +108,30 @@
   <ul class="post-list">
     
       <li>
+        <span class="post-meta">Jul 29, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/07/29/enyo-daily-7-events-part-2.html">Enyo Daily #7 - Events - Part 2</a>
+        </h2>
+        <p>
+        <p><p>In<a href="http://blog.technisode.com/post/8155837364/enyo-daily-6-events-part-1"> Part 1 about Events</a> in enyo, I covered defining, triggering, and reacting to custom events for enyo Components.  The other source is DOM events triggered by user interactions or window changes.[[MORE]]</p>
+<p>First off, here are the supported DOM events in enyo:</p>
+<blockquote>
+<p><strong>Document Events</strong><br />mousedown, mouseup, mouseover, mouseout, mousemove, click, dblclick, change, keydown, keyup, keypress, input</p>
+<p><strong>Window Events</strong><br />resize, load, unload</p>
+</blockquote>
+<p>There are two phases to DOM event handling in enyo:  capture and bubble.  The capture phase starts with the eldest ancestor, calls captureDomEvent (if found), and continues downt the hierarchy until a captureDomEvent call returns true or reaches the source Control of the event.</p>
+<p>If nothing captures the event, it's passed to the bubble phase.  This phase traverses the opposite direction -- from node to parent.  Again, if an event handler (dispatchDomEvent in the bubble phase) returns true, the phase stops; otherwise it continues until it reaches the top of the DOM tree.  Also, if stopPropagation() is called on the event object, the phase will end as well.</p>
+<p>Unlike the capture phase where you must implement captureDomEvent to handle the event, enyo.Component implements dispatchDomEvent and provides some basic routing.  It first looks for a method matching the signature eventtypeHandler (e.g. clickHandler).  If not found, it will look for an oneventtype (e.g. onclick) declaration and dispatch the event to it.  Note that these handlers are mutually exclusive; if the first is found, the second will not be called.</p>
+<p>Below is a slightly expanded example from the previous part that includes DOM event capturing and bubbling.  If you try this code out, you can add different return values to see when events are stopped in each phase.</p>
+<blockquote>
+<p>var _Example = {<br />    name:"com.technisode.example.App",<br />    kind:"Control",<br />    components:[<br />        {kind:"EventSender", name:"eventSender", onSend:"sent"},<br />        {kind:"Button", onclick:"clicked"},<br />        {kind:"Input", onkeypress:"press"}<br />    ],<br />    captureDomEvent:function(e) {<br />        enyo.log("A DOM event occured", e.type);<br />        <br />        // returning true would indicated the event is captured and prevent the bubble phase<br />        // thereby preventing the declared handlers (clicked in this case) from being called<br />        <br />        // returning false (or no explicit return) lets things continue<br />        return false;<br />    },<br />    dispatchDomEvent:function(e) {<br />        // like any other method, you could override dispatchDomEvent and implement custom routing<br />        e.myCustomField = "This is a custom field";<br />        <br />        return this.inherited(arguments);<br />    },<br />    press:function(source, event) {<br />        enyo.log(source, event);<br />    },<br />    clickHandler:function(source, event) {<br />        enyo.log("bubbled up to me", event.myCustomField);<br />        <br />        // calling event.stopPropagation() or returning true will end the bubble phase<br />    },<br />    clicked:function(source, event) {<br />        // trigger my custom events<br />        this.$.eventSender.go();<br />        <br />        // toggles event handler between send and secondSent ... just because ...<br />        this.$.eventSender.onSend = (this.$.eventSender.onSend === "sent") ? "secondSent" : "sent";<br />        <br />        // calling event.stopPropagation() or returning true will end the bubble phase<br />    },<br />    sent:function(source, one, two, three) {<br />        enyo.log("sent", one, two, three)<br />    },<br />    handleOnAlert:function(source, obj) {<br />        enyo.log("alerted", enyo.json.stringify(obj));<br />    },<br />    secondSent:function(source, one, two, three) {<br />        enyo.log("secondSent handles onSend now", one, two, three)<br />    }<br />}<br /><br />var _EventSender = {<br />    name:"EventSender",<br />    kind:"Component",<br />    events:{ <br />        onSend:"handleOnSend",<br />        onAlert:{value:"handleOnAlert", caller:"sendAlert"}<br />    },<br />    go:function() {<br />        this.doSend(1,2,3);    // dispatchIndirectly<br />        this.sendAlert({a:1, b:2});<br />    }<br />}<br /><br />enyo.kind(_EventSender);<br />enyo.kind(_Example);</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
         <span class="post-meta">Jul 27, 2011</span>
 
         <h2>

@@ -1,0 +1,6 @@
+I"x<p>As part of getting this blog up and running, I’m sharing a few of the things I’ve set up for others
+doing the same. This installment is the rather simple <a href="http://codepen.io">CodePen</a> include to embed
+pens in my posts. I took it a step further to allow including any pen by <code class="language-plaintext highlighter-rouge">hash</code> and <code class="language-plaintext highlighter-rouge">username</code> with
+the latter defaulting to the <code class="language-plaintext highlighter-rouge">codepen_username</code> value in the site’s <code class="language-plaintext highlighter-rouge">_config.yml</code>.</p>
+
+:ET

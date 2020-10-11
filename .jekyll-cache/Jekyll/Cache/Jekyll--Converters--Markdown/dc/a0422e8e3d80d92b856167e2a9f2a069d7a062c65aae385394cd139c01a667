@@ -1,0 +1,3 @@
+I"ž<p>Wanted to share a preview of a new kind Iâ€™ve been working on. The idea stemmed from a recent patch I submitted to fix remote loading of js into enyo. A prime use case for that capbility is to deliver a mobile website in which the entire site could be integrated into a single enyo app without loading the entire source on load. Each view could be managed by a parent enyo.Panels and loaded as requested.</p>
+
+:ET

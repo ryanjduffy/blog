@@ -107,6 +107,6 @@ post_history.style.display = 'block';
 ## Conclusion
 
 I'm pretty happy with the result and I think it'll give good visibility into the post. You can see
-the [most recent code](https://github.com/ryanjduffy/blog/blob/gh-pages/_includes/history.html) for
+the [most recent code](https://github.com/ryanjduffy/blog/blob/master/_includes/history.html) for
 the include on GitHub. Questions/Comments below or open a PR with a change and see yourself in a
 post showing how it's possible to see yourself!

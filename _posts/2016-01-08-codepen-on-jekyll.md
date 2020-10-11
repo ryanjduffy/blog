@@ -15,7 +15,7 @@ the latter defaulting to the `codepen_username` value in the site's `_config.yml
 <!--more-->
 
 Below is the source (as of this writing) or you can see the [latest on Github.]
-(https://github.com/ryanjduffy/blog/blob/gh-pages/_includes/codepen.html).
+(https://github.com/ryanjduffy/blog/blob/master/_includes/codepen.html).
 
 {% raw %}
 ```liquid

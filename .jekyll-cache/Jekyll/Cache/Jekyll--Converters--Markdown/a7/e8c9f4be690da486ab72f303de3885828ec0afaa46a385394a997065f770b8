@@ -1,0 +1,98 @@
+I"S,<p>Now that I’ve bought into a Jekyll-based blog running on GitHub Pages, the next step was to surface
+the revision history for a post at the bottom so readers can easily see when and what was updated.</p>
+
+<!--more-->
+
+<h2 id="retrieving-the-history">Retrieving the History</h2>
+
+<p>I had a couple thoughts on how I might get the git history onto the post. My first instinct was to
+find a plugin for Jekyll to do the trick. I found, however, that <a href="http://jekyllrb.com/docs/plugins/">GitHub doesn’t support custom
+Jekyll plugins</a> on deployment so that wouldn’t work. I also
+briefly considered a commit hook which I think would work but was quickly interrupted by a better
+idea: <a href="https://developer.github.com/v3/">GitHub’s JSON API</a>!</p>
+
+<p>The relevant endpoint is the <a href="https://developer.github.com/v3/repos/commits/">commits</a> for the repo
+of interest. By default, this will give you the commits for the entire repository but can be
+filtered by path which is exactly what I needed.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GET /repos/:owner/:repo/commits?path=/_posts/post-name.md
+</code></pre></div></div>
+
+<p>Creating that URL in Jekyll requires stitching together a couple variables from the site’s
+<code class="language-plaintext highlighter-rouge">_config.yml</code>.</p>
+
+<div class="language-liquid highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://api.github.com/repos/<span class="p">{{</span><span class="w"> </span><span class="nv">site</span><span class="p">.</span><span class="nv">github_username</span><span class="w"> </span><span class="p">}}{{</span><span class="w"> </span><span class="nv">site</span><span class="p">.</span><span class="nv">baseurl</span><span class="w"> </span><span class="p">}}</span>/commits?path=<span class="p">{{</span><span class="w"> </span><span class="nv">page</span><span class="p">.</span><span class="nv">path</span><span class="w"> </span><span class="p">}}</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>In my case, <code class="language-plaintext highlighter-rouge">site.baseurl</code> was the repository name prepended by a slash. If you have a custom
+domain in place, you may need to alter that to your needs.</p>
+</blockquote>
+
+<h2 id="fetching-via-js">Fetching via JS</h2>
+
+<p>With the URL built, I’m ready to write up the JS to fetch it and inject it into the DOM. I’ll admit
+that my pure XHR skills have rusted a bit but I didn’t want to introduce a library and the refresher
+was good.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">url</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">https://api.github.com/repos/ryanjduffy/blog//commits?path=_posts/2016-01-08-including-git-history-in-a-jekyll-post.md</span><span class="dl">'</span><span class="p">,</span>
+		<span class="nx">xhr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">XMLHttpRequest</span><span class="p">();</span>
+	<span class="nx">xhr</span><span class="p">.</span><span class="nx">open</span><span class="p">(</span><span class="dl">'</span><span class="s1">GET</span><span class="dl">'</span><span class="p">,</span> <span class="nx">url</span><span class="p">);</span>
+	<span class="nx">xhr</span><span class="p">.</span><span class="nx">send</span><span class="p">();</span>
+	<span class="nx">xhr</span><span class="p">.</span><span class="nx">onreadystatechange</span> <span class="o">=</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+		<span class="kd">var</span> <span class="nx">commits</span><span class="p">;</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">readyState</span> <span class="o">!==</span> <span class="mi">4</span> <span class="o">||</span> <span class="nx">xhr</span><span class="p">.</span><span class="nx">status</span> <span class="o">!==</span> <span class="mi">200</span><span class="p">)</span> <span class="k">return</span><span class="p">;</span>
+
+		<span class="nx">commits</span> <span class="o">=</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">xhr</span><span class="p">.</span><span class="nx">responseText</span><span class="p">);</span>
+		<span class="k">if</span> <span class="p">(</span><span class="nx">commits</span> <span class="o">&amp;&amp;</span> <span class="nx">commits</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+			<span class="c1">// create the DOM nodes</span>
+		<span class="p">}</span>
+	<span class="p">};</span>
+<span class="p">})();</span>
+</code></pre></div></div>
+
+<h2 id="into-the-dom">Into the DOM</h2>
+
+<p>I elected for simple string concatenation to build the inner HTML. The UI is loosely based on the
+commit history UI from GitHub. I’ve simplified it to only show the authorship and the first line of
+the commit message which links to the commit on GitHub for the curious. Keeping with the relative
+time used on GitHub, I pulled in <a href="http://momentjs.com">moment.js</a>.</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">html</span> <span class="o">=</span> <span class="nx">commits</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">commit</span><span class="p">)</span> <span class="p">{</span>
+	<span class="kd">var</span> <span class="nx">author</span> <span class="o">=</span> <span class="nx">commit</span><span class="p">.</span><span class="nx">commit</span><span class="p">.</span><span class="nx">author</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span>
+		<span class="nx">avatar</span> <span class="o">=</span> <span class="nx">commit</span><span class="p">.</span><span class="nx">author</span><span class="p">.</span><span class="nx">avatar_url</span><span class="p">,</span>
+		<span class="nx">date</span> <span class="o">=</span> <span class="nx">moment</span><span class="p">(</span><span class="k">new</span> <span class="nb">Date</span><span class="p">(</span><span class="nx">commit</span><span class="p">.</span><span class="nx">commit</span><span class="p">.</span><span class="nx">author</span><span class="p">.</span><span class="nx">date</span><span class="p">)).</span><span class="nx">fromNow</span><span class="p">(),</span>
+		<span class="nx">message</span> <span class="o">=</span> <span class="nx">commit</span><span class="p">.</span><span class="nx">commit</span><span class="p">.</span><span class="nx">message</span><span class="p">.</span><span class="nx">split</span><span class="p">(</span><span class="dl">'</span><span class="se">\n</span><span class="dl">'</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span>
+		<span class="nx">url</span> <span class="o">=</span> <span class="nx">commit</span><span class="p">.</span><span class="nx">html_url</span><span class="p">;</span>
+	
+	<span class="k">return</span> <span class="dl">'</span><span class="s1">&lt;div class="history-entry"&gt;</span><span class="dl">'</span> <span class="o">+</span>
+				<span class="dl">'</span><span class="s1">&lt;img src="</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">avatar</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">"&gt;</span><span class="dl">'</span> <span class="o">+</span>
+				<span class="dl">'</span><span class="s1">&lt;a href="</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">url</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">" target="gh-history"&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">message</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/a&gt;</span><span class="dl">'</span> <span class="o">+</span>
+				<span class="dl">'</span><span class="s1">&lt;span&gt;</span><span class="dl">'</span> <span class="o">+</span> <span class="nx">author</span> <span class="o">+</span> <span class="dl">'</span><span class="s1"> updated this </span><span class="dl">'</span> <span class="o">+</span> <span class="nx">date</span><span class="p">.</span><span class="nx">toLocaleString</span><span class="p">()</span> <span class="o">+</span> <span class="dl">'</span><span class="s1">&lt;/span&gt;</span><span class="dl">'</span> <span class="o">+</span> 
+			<span class="dl">'</span><span class="s1">&lt;/div&gt;</span><span class="dl">'</span><span class="p">;</span>
+<span class="p">});</span>
+</code></pre></div></div>
+
+<p>Though it’s unlikely to catch me, I decided to santize the author’s name and commit message to avoid
+any markup that might be there from breaking the UI. Borrowed some [code from SO]
+(http://stackoverflow.com/questions/1219860/html-encoding-in-javascript-jquery) and away we go.
+Finally, we’ll inject that HTML into the DOM. To guard against network/JS failures, the target is
+initially hidden and only shown when the HTML has been generated.</p>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">"post_history"</span> <span class="na">class=</span><span class="s">"post-history"</span> <span class="na">style=</span><span class="s">"display: none"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;h3&gt;</span>Revisions<span class="nt">&lt;/h3&gt;</span>
+<span class="nt">&lt;/div&gt;</span>
+</code></pre></div></div>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">post_history</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">post_history</span><span class="dl">'</span><span class="p">);</span>
+<span class="nx">post_history</span><span class="p">.</span><span class="nx">innerHTML</span> <span class="o">+=</span> <span class="nx">html</span><span class="p">;</span>
+<span class="nx">post_history</span><span class="p">.</span><span class="nx">style</span><span class="p">.</span><span class="nx">display</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">block</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>I’m pretty happy with the result and I think it’ll give good visibility into the post. You can see
+the <a href="https://github.com/ryanjduffy/blog/blob/master/_includes/history.html">most recent code</a> for
+the include on GitHub. Questions/Comments below or open a PR with a change and see yourself in a
+post showing how it’s possible to see yourself!</p>
+:ET

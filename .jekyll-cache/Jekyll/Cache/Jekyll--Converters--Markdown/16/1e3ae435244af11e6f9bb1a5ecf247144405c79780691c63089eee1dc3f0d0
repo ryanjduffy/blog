@@ -1,0 +1,355 @@
+I"��<p>After getting a <a href="/blog/2019/07/04/rust-wasm-getting-started.html">basic game of life running in Rust + WASM</a>, I wanted to expand it a bit further to
+allow seeding the initial state. Initially, I planned to allow an array of flags
+to seed any value but decided instead to use strings instead. It proved to be a
+bit more difficult but also more interesting.</p>
+
+<!--more-->
+
+<h1 id="adding-seed-arg">Adding <code class="language-plaintext highlighter-rouge">seed</code> arg</h1>
+
+<p>I started by adding <code class="language-plaintext highlighter-rouge">seed</code> to my existing <code class="language-plaintext highlighter-rouge">UniverseOptions</code> struct as
+<code class="language-plaintext highlighter-rouge">Option&lt;String&gt;</code>. Omitting the seed will cause the app to fall to back to a
+random seed as before.</p>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">impl</span> <span class="n">UniverseOptions</span> <span class="p">{</span>
+    <span class="k">pub</span> <span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">width</span><span class="p">:</span> <span class="nb">Option</span><span class="o">&lt;</span><span class="nb">u32</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">Option</span><span class="o">&lt;</span><span class="nb">u32</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">Option</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">UniverseOptions</span> <span class="p">{</span>
+        <span class="n">UniverseOptions</span> <span class="p">{</span>
+            <span class="n">width</span><span class="p">,</span>
+            <span class="n">height</span><span class="p">:</span> <span class="k">match</span> <span class="n">height</span> <span class="p">{</span>
+                <span class="nb">None</span> <span class="k">=&gt;</span> <span class="n">width</span><span class="p">,</span>
+                <span class="nf">Some</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="k">=&gt;</span> <span class="nf">Some</span><span class="p">(</span><span class="n">h</span><span class="p">)</span>
+            <span class="p">},</span>
+            <span class="n">seed</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>In <code class="language-plaintext highlighter-rouge">Universe</code>, I extract the value and default it to an empty string.</p>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">impl</span> <span class="n">Universe</span> <span class="p">{</span>
+    <span class="k">pub</span> <span class="k">fn</span> <span class="nf">new</span><span class="p">(</span><span class="n">opts</span><span class="p">:</span> <span class="nb">Option</span><span class="o">&lt;</span><span class="n">UniverseOptions</span><span class="o">&gt;</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">Universe</span> <span class="p">{</span>
+        <span class="k">let</span> <span class="n">UniverseOptions</span> <span class="p">{</span><span class="n">width</span><span class="p">:</span> <span class="n">width_opt</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="n">height_opt</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="n">seed_opt</span><span class="p">}</span> <span class="o">=</span> <span class="n">opts</span><span class="nf">.unwrap_or</span><span class="p">(</span><span class="n">UniverseOptions</span> <span class="p">{</span>
+            <span class="n">width</span><span class="p">:</span> <span class="nb">None</span><span class="p">,</span>
+            <span class="n">height</span><span class="p">:</span> <span class="nb">None</span><span class="p">,</span>
+            <span class="n">seed</span><span class="p">:</span> <span class="nb">None</span>
+        <span class="p">});</span>
+        <span class="k">let</span> <span class="n">width</span> <span class="o">=</span> <span class="n">width_opt</span><span class="nf">.unwrap_or</span><span class="p">(</span><span class="mi">64</span><span class="p">);</span>
+        <span class="k">let</span> <span class="n">height</span> <span class="o">=</span> <span class="n">height_opt</span><span class="nf">.unwrap_or</span><span class="p">(</span><span class="mi">64</span><span class="p">);</span>
+        <span class="k">let</span> <span class="n">seed</span> <span class="o">=</span> <span class="n">seed_opt</span><span class="nf">.unwrap_or</span><span class="p">(</span><span class="nn">String</span><span class="p">::</span><span class="nf">from</span><span class="p">(</span><span class="s">""</span><span class="p">));</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+    <span class="o">...</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>I find a struct to be good way to handle optional args from JS but I’d like a
+better bridge than using <code class="language-plaintext highlighter-rouge">UnverseOptions.new()</code> that would allow me to pass a
+generic object and it be cast into correct struct. I’m guessing such a thing
+exists already but I just haven’t discovered it yet.</p>
+
+<h1 id="refactoring-out-population">Refactoring Out Population</h1>
+
+<p>The code in <code class="language-plaintext highlighter-rouge">Universe::new</code> was quickly getting out of hand so my first step was
+to refactor the population logic into a new <code class="language-plaintext highlighter-rouge">fill_cells</code> method. Initially, it
+was pretty redundant. I didn’t save the code but something like:</p>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">fill_cells</span><span class="p">(</span><span class="n">width</span><span class="p">:</span> <span class="nb">u32</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">u32</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="o">&amp;</span><span class="nb">str</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="n">seed</span><span class="nf">.len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+        <span class="c">// generate random cells and return</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="c">// generate cells from text and return</span>
+        <span class="c">// this code never worked at this point :/</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>By the end, I eventually moved to the following which only generated the cells
+once for either branch and delegated populating specific cells to one of two
+methods.</p>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">fill_cells</span><span class="p">(</span><span class="n">width</span><span class="p">:</span> <span class="nb">u32</span><span class="p">,</span> <span class="n">height</span><span class="p">:</span> <span class="nb">u32</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="o">&amp;</span><span class="nb">str</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="k">mut</span> <span class="n">cells</span><span class="p">:</span> <span class="nb">Vec</span><span class="o">&lt;</span><span class="n">Cell</span><span class="o">&gt;</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="n">width</span> <span class="o">*</span> <span class="n">height</span><span class="p">)</span><span class="nf">.map</span><span class="p">(|</span><span class="mi">_</span><span class="p">|</span> <span class="nn">Cell</span><span class="p">::</span><span class="n">Dead</span><span class="p">)</span><span class="nf">.collect</span><span class="p">();</span>
+
+    <span class="k">if</span> <span class="n">seed</span><span class="nf">.len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+        <span class="nf">fill_random</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="n">cells</span><span class="p">);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nf">fill_seed</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="n">cells</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">seed</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="n">cells</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="defining-a-font">Defining a Font</h1>
+
+<p>Since I’m accepting strings, I need a way to convert a given character into a
+bitmapped glyph. It took me some searching but eventually landed on a constant
+<code class="language-plaintext highlighter-rouge">u8</code> array with each character being represented by 20 elements of the array.
+<code class="language-plaintext highlighter-rouge">1</code> represents an alive cell and <code class="language-plaintext highlighter-rouge">0</code> a dead cell. This approach allowed me to
+“see” the character in code so I could predict how it would render on the web.
+It was a bit laborious to create them all but likely took less time than
+searching for either an algorithm to create them or an example to steal.</p>
+
+<blockquote>
+  <p>As a future exercise, I’ve considered converting these to bit flags which
+could be stored more efficiently than an array of <code class="language-plaintext highlighter-rouge">u8</code>.</p>
+</blockquote>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">const</span> <span class="n">FONT</span><span class="p">:</span> <span class="p">[</span><span class="nb">u8</span><span class="p">;</span> <span class="mi">20</span> <span class="o">*</span> <span class="mi">26</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c">// A</span>
+    <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="c">// B</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="c">// ... etc ...</span>
+<span class="p">]</span>
+</code></pre></div></div>
+
+<p>This matches the design of the <code class="language-plaintext highlighter-rouge">cells</code> array and requires similar math to
+convert from the local coordinate system of the font to that of the <code class="language-plaintext highlighter-rouge">cells</code>
+array. Below is an early working version.</p>
+
+<p>I’m tracking the position of the next character with <code class="language-plaintext highlighter-rouge">col_offset</code>. Each
+character is 4 bits wide by 5 bits tall and I’m adding 1 bit of letter spacing
+so each character printed will increase the <code class="language-plaintext highlighter-rouge">col_offset</code> by 5. I iterate over
+the characters, convert to the index in my font (<code class="language-plaintext highlighter-rouge">65</code> is the character code for
+<code class="language-plaintext highlighter-rouge">A</code>), and map the glyph bits onto the corresponding cells.</p>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">let</span> <span class="k">mut</span> <span class="n">col_offset</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="k">for</span> <span class="n">c</span> <span class="n">in</span> <span class="n">seed</span><span class="nf">.chars</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="n">index</span> <span class="o">=</span> <span class="n">c</span> <span class="k">as</span> <span class="nb">i32</span> <span class="o">-</span> <span class="mi">65</span><span class="p">;</span>
+
+    <span class="c">// guard against overflowing</span>
+    <span class="k">if</span> <span class="n">col_offset</span> <span class="o">&gt;=</span> <span class="n">width</span> <span class="o">-</span> <span class="mi">4</span> <span class="p">{</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">FONT</span><span class="nf">.len</span><span class="p">()</span> <span class="k">as</span> <span class="nb">i32</span> <span class="p">{</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="n">in</span> <span class="mi">0</span><span class="o">..</span><span class="mi">20</span> <span class="p">{</span>
+            <span class="k">let</span> <span class="n">cell_index</span> <span class="o">=</span> <span class="p">((</span><span class="n">i</span> <span class="o">-</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">width</span> <span class="o">+</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">4</span> <span class="o">+</span> <span class="n">col_offset</span><span class="p">;</span>
+            <span class="n">cells</span><span class="p">[</span><span class="n">cell_index</span> <span class="k">as</span> <span class="nb">usize</span><span class="p">]</span> <span class="o">=</span> <span class="k">match</span> <span class="n">FONT</span><span class="p">[(</span><span class="n">index</span> <span class="o">*</span> <span class="mi">20</span> <span class="o">+</span> <span class="n">i</span> <span class="k">as</span> <span class="nb">i32</span><span class="p">)</span> <span class="k">as</span> <span class="nb">usize</span><span class="p">]</span> <span class="p">{</span>
+                <span class="mi">1</span> <span class="k">=&gt;</span> <span class="nn">Cell</span><span class="p">::</span><span class="n">Alive</span><span class="p">,</span>
+                <span class="mi">_</span> <span class="k">=&gt;</span> <span class="nn">Cell</span><span class="p">::</span><span class="n">Dead</span>
+            <span class="p">};</span>
+        <span class="p">}</span>
+
+        <span class="n">col_offset</span> <span class="o">+=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="unit-test">Unit Test!</h1>
+
+<p>Unit testing is so important in nearly all projects to deliver a quality
+product. In projects with multiple layers, particularly when there is
+translation between those layers, unit testing is critical. I would frequently
+hit “unreachable executed” errors when something failed in WASM-land and
+debugging was difficult. Validating that the code worked correctly in Rust helps
+to limit interop debugging to interop concerns.</p>
+
+<p>TL; DR: Write unit tests!</p>
+
+<h1 id="adding-centering">Adding Centering</h1>
+
+<p>I initially avoided text positioning by calculating the “canvas” size in JS
+based on the text size. So for example, the text “DAD” would be generated inside
+a 15x5 canvas. This produced some interesting results on its own since the text
+ran the the bounds and the game of life algorithm wraps around the bounds.</p>
+
+<p><img src="/blog/images/dad.gif" alt="game of life with DAD as seed string" /></p>
+
+<p>Always up for a challenge, I decided to add support to center the text
+vertically and horizontally in the canvas which turned out to be pretty
+straightforward given my current implementation. The existing <code class="language-plaintext highlighter-rouge">col_offset</code>
+variable could be repurposed to start at a non-zero to adjust from where the
+text began. Vertical centering required a new variable, <code class="language-plaintext highlighter-rouge">row_offset</code>, which was
+calculated as a function of the <code class="language-plaintext highlighter-rouge">height</code> of the canvas.</p>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">let</span> <span class="n">row_offset</span> <span class="o">=</span> <span class="p">((</span><span class="n">height</span> <span class="o">-</span> <span class="mi">5</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="k">as</span> <span class="nb">usize</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="rounding-down">Rounding Down</h2>
+
+<p>In this non-subpixel, anti-aliasing free world, the calculations need to land on
+whole numbers. As a regular JS engineer, my first instinct for this calculation
+was to round the value down.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">rowOffset</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">((</span><span class="nx">height</span> <span class="o">-</span> <span class="mi">5</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p>This would be possible in Rust too (I’m assuming: I didn’t explicitly try) but
+casting (or whatever Rust calls it) the floating point value into <code class="language-plaintext highlighter-rouge">usize</code> did
+the trick here.</p>
+
+<h2 id="type-compatibility">Type compatibility</h2>
+
+<p>I’m still coming to grips with working in a strongly typed language again. I’ve
+worked in C, C++, and Java in my past but am rusty (pun intended). I’ve
+discovered <code class="language-plaintext highlighter-rouge">as</code> to coerce types around but find I’m still pretty inefficient. I
+also expect types (e.g. <code class="language-plaintext highlighter-rouge">u32</code> and <code class="language-plaintext highlighter-rouge">usize</code> to be usable together) though they
+can’t. I understand why but have been “spoiled” by JS for too long I guess.</p>
+
+<h1 id="extending-character-support">Extending character support</h1>
+
+<p>The last feature I wanted to add for this iteration was some extended character
+support. I’m not interested in creating a complete font but wanted to at least
+support spaces and the ‘+’ character (so I could output “Welcome to Rust +
+WASM”).</p>
+
+<p>I could have added space as a glyph in my font but that seemed too large
+visually so I decided to implement it uniquely as a 2 column width space. This
+implementation choice affected two parts: width calculation for centering and
+text rendering.</p>
+
+<blockquote>
+  <p>In retrospect, I might have chosen to render the text into a separate buffer,
+measure it for centering, and then copy into the output buffer. But I didn’t
+here. :)</p>
+</blockquote>
+
+<p>For the width calculation, I refactored out a new function, <code class="language-plaintext highlighter-rouge">calc_seed_width</code>,
+which accepts the seed and returns the width. I also added a <code class="language-plaintext highlighter-rouge">has_char</code> function
+to help filter the text based on the supported glyphs in my font.</p>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">has_char</span> <span class="p">(</span><span class="n">c</span><span class="p">:</span> <span class="nb">char</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">bool</span> <span class="p">{</span>
+    <span class="n">c</span> <span class="o">&gt;=</span> <span class="sc">'A'</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">'Z'</span>
+<span class="p">}</span>
+
+<span class="k">fn</span> <span class="nf">calc_seed_width</span> <span class="p">(</span><span class="n">seed</span><span class="p">:</span> <span class="o">&amp;</span><span class="nb">str</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">usize</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="k">mut</span> <span class="n">width</span><span class="p">:</span> <span class="nb">usize</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+
+    <span class="k">for</span> <span class="n">c</span> <span class="n">in</span> <span class="n">seed</span><span class="nf">.chars</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="sc">' '</span> <span class="p">{</span>
+            <span class="n">width</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nf">has_char</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="p">{</span>
+            <span class="n">width</span> <span class="o">+=</span> <span class="mi">5</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="n">width</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>To support text rendering, I did some further refactoring to the font indexing
+in order to support the “+” character which didn’t line up to its character code
+position. Using <code class="language-plaintext highlighter-rouge">Option</code> allowed me a more intuitive API than “less than zero”
+for valid indices which I adopted in an updated <code class="language-plaintext highlighter-rouge">has_char</code> function.</p>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">get_font_index</span> <span class="p">(</span><span class="n">c</span><span class="p">:</span> <span class="nb">char</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">Option</span><span class="o">&lt;</span><span class="nb">usize</span><span class="o">&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="o">&gt;=</span> <span class="sc">'A'</span> <span class="o">&amp;&amp;</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="sc">'Z'</span> <span class="p">{</span>
+        <span class="nf">Some</span><span class="p">(</span><span class="n">c</span> <span class="k">as</span> <span class="nb">usize</span> <span class="o">-</span> <span class="mi">65</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="sc">'+'</span> <span class="p">{</span>
+        <span class="nf">Some</span><span class="p">(</span><span class="mi">27</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="nb">None</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">fn</span> <span class="nf">has_char</span> <span class="p">(</span><span class="n">c</span><span class="p">:</span> <span class="nb">char</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">bool</span> <span class="p">{</span>
+    <span class="k">match</span> <span class="nf">get_font_index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">None</span> <span class="k">=&gt;</span> <span class="k">false</span><span class="p">,</span>
+        <span class="mi">_</span> <span class="k">=&gt;</span> <span class="k">true</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">fill_seed</code> before space and “+” support:</p>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">c</span> <span class="n">in</span> <span class="n">seed</span><span class="nf">.chars</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="n">index</span> <span class="o">=</span> <span class="n">c</span> <span class="k">as</span> <span class="nb">i32</span> <span class="o">-</span> <span class="mi">65</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">FONT</span><span class="nf">.len</span><span class="p">()</span> <span class="k">as</span> <span class="nb">i32</span> <span class="p">{</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>… And after space and “+” support:</p>
+
+<div class="language-rs highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">c</span> <span class="n">in</span> <span class="n">seed</span><span class="nf">.chars</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="o">==</span> <span class="sc">' '</span> <span class="p">{</span>
+        <span class="n">col_offset</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="k">let</span> <span class="nf">Some</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">=</span> <span class="nf">get_font_index</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="p">{</span>
+        <span class="o">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="updating-the-javascript-side">Updating the JavaScript side</h1>
+
+<p>In order to test more text combinations, I took the lazy approach of plucking
+the value from the query string. Since the value of <code class="language-plaintext highlighter-rouge">document.location.search</code>
+includes the leading “?”, I stripped that using <code class="language-plaintext highlighter-rouge">.substring(1)</code>.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">str</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">search</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">Rust</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<p>However, I quickly discovered that didn’t work right because the value was URL
+encoded … I should have remembered that but didn’t.</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">str</span> <span class="o">=</span> <span class="nb">decodeURI</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">search</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">Rust</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h1 id="easter-eggs">Easter Eggs</h1>
+
+<p>With all of that in place, I thought it’d be fun to turn it into an easter egg
+in which the text would render initially but trigger the game once the mouse
+hovered. I won’t cover the details here but it made for a fun exercise.</p>
+
+<p><img src="/blog/images/rust+wasm.gif" alt="game of life with Welcome to Rust+WASM as seed string" /></p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Universe</span><span class="p">,</span> <span class="nx">UniverseOptions</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">"</span><span class="s2">wasm-game-of-life</span><span class="dl">"</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">pre</span> <span class="o">=</span> <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">"</span><span class="s2">game-of-life-canvas</span><span class="dl">"</span><span class="p">);</span>
+<span class="kd">let</span> <span class="nx">universe</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">init</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="kd">const</span> <span class="nx">str</span> <span class="o">=</span> <span class="nb">decodeURI</span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">location</span><span class="p">.</span><span class="nx">search</span><span class="p">.</span><span class="nx">substring</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="o">||</span> <span class="dl">'</span><span class="s1">Rust</span><span class="dl">'</span><span class="p">;</span>
+    <span class="nx">universe</span> <span class="o">=</span> <span class="nx">Universe</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="nx">UniverseOptions</span><span class="p">.</span><span class="k">new</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="nx">str</span><span class="p">.</span><span class="nx">toUpperCase</span><span class="p">()));</span>
+<span class="p">}</span>
+
+<span class="kd">const</span> <span class="nx">render</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">pre</span><span class="p">.</span><span class="nx">textContent</span> <span class="o">=</span> <span class="nx">universe</span><span class="p">.</span><span class="nx">render</span><span class="p">();</span>
+    <span class="nx">universe</span><span class="p">.</span><span class="nx">tick</span><span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kd">let</span> <span class="nx">raf</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">renderLoop</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">render</span><span class="p">();</span>
+    <span class="nx">raf</span> <span class="o">=</span> <span class="nb">window</span><span class="p">.</span><span class="nx">setTimeout</span><span class="p">(</span><span class="nx">renderLoop</span><span class="p">,</span> <span class="mi">64</span><span class="p">);</span>
+<span class="p">};</span>
+
+<span class="kd">const</span> <span class="nx">play</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">raf</span> <span class="o">===</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="nx">renderLoop</span><span class="p">();</span>
+
+<span class="kd">const</span> <span class="nx">stop</span> <span class="o">=</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">raf</span> <span class="o">!==</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nb">window</span><span class="p">.</span><span class="nx">clearTimeout</span><span class="p">(</span><span class="nx">raf</span><span class="p">);</span>
+        <span class="nx">raf</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="nx">pre</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">mouseover</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">play</span><span class="p">());</span>
+<span class="nx">pre</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">mouseout</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">stop</span><span class="p">());</span>
+<span class="nx">pre</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">mousedown</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="p">{</span>
+    <span class="nx">stop</span><span class="p">();</span>
+    <span class="nx">init</span><span class="p">();</span>
+    <span class="nx">render</span><span class="p">();</span>
+<span class="p">});</span>
+<span class="nx">pre</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="dl">'</span><span class="s1">mouseup</span><span class="dl">'</span><span class="p">,</span> <span class="p">()</span> <span class="o">=&gt;</span> <span class="nx">play</span><span class="p">());</span>
+
+<span class="nx">init</span><span class="p">();</span>
+<span class="nx">render</span><span class="p">();</span>
+</code></pre></div></div>
+
+<hr />
+
+<p><em>Thanks for making it this far! These posts have gotten long with all the code samples. If you have suggestions on how to improve the code here, I’d love to hear them. I’m just getting started in Rust and appreciate advice. Reach out via a <a href="https://twitter.com/theryanjduffy">Twitter</a>, <a href="ryan@tiqtech.com">email</a>, or <a href="https://github.com/ryanjduffy/blog/issues">GitHub Issue</a>.</em></p>
+:ET

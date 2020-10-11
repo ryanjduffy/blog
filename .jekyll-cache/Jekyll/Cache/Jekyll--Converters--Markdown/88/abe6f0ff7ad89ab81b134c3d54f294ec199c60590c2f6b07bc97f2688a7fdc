@@ -1,0 +1,4 @@
+I"x<p><p>Here's a quick way to adapt the Panels CarouselArranger to peek the previous panel.  By setting peekWidth on the Panels instance, this modified arranger will offset the left by that amount.  It isn't a perfect implementation (e.g. you can see the prior panel in the background when you slide the current panel away) but it would probably work in many cases.</p>
+
+</p>
+:ET

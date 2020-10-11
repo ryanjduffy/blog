@@ -1,0 +1,33 @@
+I"r<p>As part of getting this blog up and running, I’m sharing a few of the things I’ve set up for others
+doing the same. This installment is the rather simple <a href="http://codepen.io">CodePen</a> include to embed
+pens in my posts. I took it a step further to allow including any pen by <code class="language-plaintext highlighter-rouge">hash</code> and <code class="language-plaintext highlighter-rouge">username</code> with
+the latter defaulting to the <code class="language-plaintext highlighter-rouge">codepen_username</code> value in the site’s <code class="language-plaintext highlighter-rouge">_config.yml</code>.</p>
+
+<!--more-->
+
+<p>Below is the source (as of this writing) or you can see the [latest on Github.]
+(https://github.com/ryanjduffy/blog/blob/master/_includes/codepen.html).</p>
+
+<div class="language-liquid highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{%</span><span class="w"> </span><span class="nt">assign</span><span class="w"> </span><span class="nv">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">include</span><span class="p">.</span><span class="nv">username</span><span class="w"> </span><span class="p">%}</span>
+<span class="p">{%</span><span class="w"> </span><span class="kr">unless</span><span class="w"> </span><span class="nv">username</span><span class="w"> </span><span class="p">%}</span>
+	<span class="p">{%</span><span class="w"> </span><span class="nt">assign</span><span class="w"> </span><span class="nv">username</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">site</span><span class="p">.</span><span class="nv">codepen_username</span><span class="w"> </span><span class="p">%}</span>
+<span class="p">{%</span><span class="w"> </span><span class="kr">endunless</span><span class="w"> </span><span class="p">%}</span>
+&lt;p data-height="228" data-theme-id="0" data-slug-hash="<span class="p">{{</span><span class="w"> </span><span class="nv">include</span><span class="p">.</span><span class="nv">hash</span><span class="w"> </span><span class="p">}}</span>" data-default-tab="result" data-user="<span class="p">{{</span><span class="w"> </span><span class="nv">username</span><span class="w"> </span><span class="p">}}</span>" class='codepen'&gt;See the Pen &lt;a href='http://codepen.io/<span class="p">{{</span><span class="w"> </span><span class="nv">username</span><span class="w"> </span><span class="p">}}</span>/pen/<span class="p">{{</span><span class="w"> </span><span class="nv">include</span><span class="p">.</span><span class="nv">hash</span><span class="w"> </span><span class="p">}}</span>/'&gt;<span class="p">{{</span><span class="w"> </span><span class="nv">include</span><span class="p">.</span><span class="nv">title</span><span class="w"> </span><span class="p">}}</span>&lt;/a&gt; by <span class="p">{{</span><span class="w"> </span><span class="nv">username</span><span class="w"> </span><span class="p">}}</span> (&lt;a href='http://codepen.io/<span class="p">{{</span><span class="w"> </span><span class="nv">username</span><span class="w"> </span><span class="p">}}</span>'&gt;@<span class="p">{{</span><span class="w"> </span><span class="nv">username</span><span class="w"> </span><span class="p">}}</span>&lt;/a&gt;) on &lt;a href='http://codepen.io'&gt;CodePen&lt;/a&gt;.&lt;/p&gt;
+&lt;script async src="//assets.codepen.io/assets/embed/ei.js"&gt;&lt;/script&gt;
+</code></pre></div></div>
+
+<h2 id="examples">Examples</h2>
+
+<div class="language-liquid highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{%</span><span class="w"> </span><span class="nt">include</span><span class="w"> </span>codepen.html<span class="w"> </span><span class="na">hash</span><span class="o">=</span><span class="s2">"WQjmGo"</span><span class="w"> </span><span class="na">title</span><span class="o">=</span><span class="s2">"Enyo Template"</span><span class="w"> </span><span class="p">%}</span>
+</code></pre></div></div>
+
+<p data-height="228" data-theme-id="0" data-slug-hash="WQjmGo" data-default-tab="result" data-user="ryanjduffy" class="codepen">See the Pen <a href="http://codepen.io/ryanjduffy/pen/WQjmGo/">Enyo Template</a> by ryanjduffy (<a href="http://codepen.io/ryanjduffy">@ryanjduffy</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+<script async="" src="//assets.codepen.io/assets/embed/ei.js"></script>
+
+<div class="language-liquid highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{%</span><span class="w"> </span><span class="nt">include</span><span class="w"> </span>codepen.html<span class="w"> </span><span class="na">hash</span><span class="o">=</span><span class="s2">"YXxmYR"</span><span class="w"> </span><span class="na">username</span><span class="o">=</span><span class="s2">"Yakudoo"</span><span class="w"> </span><span class="na">title</span><span class="o">=</span><span class="s2">"Top Pen of 2015"</span><span class="w"> </span><span class="p">%}</span>
+</code></pre></div></div>
+
+<p data-height="228" data-theme-id="0" data-slug-hash="YXxmYR" data-default-tab="result" data-user="Yakudoo" class="codepen">See the Pen <a href="http://codepen.io/Yakudoo/pen/YXxmYR/">Top Pen of 2015</a> by Yakudoo (<a href="http://codepen.io/Yakudoo">@Yakudoo</a>) on <a href="http://codepen.io">CodePen</a>.</p>
+<script async="" src="//assets.codepen.io/assets/embed/ei.js"></script>
+
+:ET

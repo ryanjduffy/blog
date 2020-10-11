@@ -1,0 +1,7 @@
+I"�<blockquote>
+  <p>Originally posted on Code Mentor: https://www.codementor.io/ryan286/git-alias-merge-conflicts-dmkcw8r3p</p>
+</blockquote>
+
+<p>Like many engineers, I spend a lot of time working with <code class="language-plaintext highlighter-rouge">git</code>. It’s an incredibly powerful tool with more options than most people ever need. If you work in the CLI like I do, you’ve probably added a few aliases to help make you more productive. Today, I added a new one to list merge conflicts.</p>
+
+:ET

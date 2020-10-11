@@ -1,0 +1,15 @@
+I"�<p>Enyo has a pretty deep inheritance heirarcy and one of our areas of research right now is ways to
+flatten it to improve performance and ease debugging. We’ve discussed increasing our use of mixins
+(or something similar, perhaps) to add functionality to a kind without defining an entirely new one.
+Mixins have a couple of drawbacks regarding overriding methods, however:</p>
+
+<ol>
+  <li>You have to use <code class="language-plaintext highlighter-rouge">kind.inherit</code> which is a bit awkward</li>
+  <li>It still increases the call stack</li>
+</ol>
+
+<p>One common place for method overrides are the lifecycle methods (e.g. <code class="language-plaintext highlighter-rouge">create()</code>, <code class="language-plaintext highlighter-rouge">destroy()</code>). In
+most cases, the mixin does its work either before or after the call to the super without modifying
+the arguments. To make this a bit easier, I’m proposing a new HookSupport mixin.</p>
+
+:ET

@@ -1,0 +1,6 @@
+I"+<p><b>Update:</b> Latest code available on <a href="https://github.com/tiqtech/enyo-extras/tree/master/source/util">github</a></p>
+
+<p>The view state framework is a relatively simple but extensible mechanism to manage the state of view controls. The definition of view control is loose but is intended to represent any control on which a user might expect to be able to "go back" to a previous state. The framework is not a view controller in MVC fashion but can be adapted to that purpose. I've done just that by extending the enyo.Panels control.
+
+</p>
+:ET

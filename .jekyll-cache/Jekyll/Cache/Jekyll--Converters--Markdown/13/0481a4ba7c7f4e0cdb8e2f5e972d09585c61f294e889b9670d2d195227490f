@@ -1,0 +1,7 @@
+I"ã<blockquote>
+  <p>Originally published on Code Mentor: https://www.codementor.io/ryan286/working-with-react-context-9vgn0gdof</p>
+</blockquote>
+
+<p>One of the most important concepts of React is unidirectional data flow. Data enters the system at one point and flows downstream with each component filtering and augmenting that data for its children. This is an incredibly simple but also very powerful paradigm that enables you to build complex systems with simple data flows.</p>
+
+:ET

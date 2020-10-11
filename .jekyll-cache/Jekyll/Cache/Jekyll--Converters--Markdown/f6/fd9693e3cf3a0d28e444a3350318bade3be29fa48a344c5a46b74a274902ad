@@ -1,6 +1,0 @@
-I"v<p><p>I've been playing around with the Cloud9 IDE a bit recently to do some remote development. It's come a long way from when I first used it and is quite functional. A great addition is an interactive command line with a git client. So I thought, "It'd be nice to get the EnyoJS bootplate up and running here."  Following the <a href="https://github.com/enyojs/enyo/wiki/Dupliforking">general instructions from the wiki</a>, I put together a set of commands that gets everything set up.</p>
-<p><b>TL; DR</b></p>
-<p>Pull in bootplate, update the submodules, and "disconnect" the master branch from the bootplate repo.</p>
-
-</p>
-:ET

@@ -1,6 +1,0 @@
-I"w<p>After getting a <a href="/blog/2019/07/04/rust-wasm-getting-started.html">basic game of life running in Rust + WASM</a>, I wanted to expand it a bit further to
-allow seeding the initial state. Initially, I planned to allow an array of flags
-to seed any value but decided instead to use strings instead. It proved to be a
-bit more difficult but also more interesting.</p>
-
-:ET

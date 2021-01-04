@@ -6,12 +6,11 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Offloaded memory</title>
-  <meta name="description" content="If I write it down here, I don't have to keep it in my head.
-">
+  <title>Custom Sign Up Handler for Netlify</title>
+  <meta name="description" content="I’ve started getting back into serverless engineering recently and decided to give Netlify a try. I appreciate their focus on JAMStack and the availability o...">
 
   <link rel="stylesheet" href="/blog/css/main.css">
-  <link rel="canonical" href="//ryanjduffy.github.io/blog/">
+  <link rel="canonical" href="//ryanjduffy.github.io/blog/2021/01/04/custom-sign-up-handler-for-netlify.html">
   <link rel="alternate" type="application/rss+xml" title="Offloaded memory" href="//feed.xml">
 </head>
 
@@ -63,56 +62,15 @@
 
     <div class="page-content">
       <div class="wrapper">
-        <div class="home">
-  
-  <h1 class="page-heading">Posts</h1>
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-  
-  
-  <div class="pagination">
-    
-      <span>&laquo; Prev</span>
-    
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Custom Sign Up Handler for Netlify</h1>
+    <p class="post-meta"><time datetime="2021-01-04T13:34:00-08:00" itemprop="datePublished">Jan 4, 2021</time></p>
+  </header>
 
-    
-      
-        <em>1</em>
-      
-    
-      
-        <a href="/blog/page2">2</a>
-      
-    
-      
-        <a href="/blog/page3">3</a>
-      
-    
-      
-        <a href="/blog/page4">4</a>
-      
-    
-      
-        <a href="/blog/page5">5</a>
-      
-    
-
-    
-      <a href="/blog/page2">Next &raquo;</a>
-    
-  </div>
-  
-
-
-  <ul class="post-list">
-    
-      <li>
-        <span class="post-meta">Jan 4, 2021</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2021/01/04/custom-sign-up-handler-for-netlify.html">Custom Sign Up Handler for Netlify</a>
-        </h2>
-        <p>
-        <p>I’ve started getting back into serverless engineering recently and decided to give <a href="https://netlify.com">Netlify</a> a try. I appreciate their focus on JAMStack and the availability of server-side functions that integrate fairly well into my local dev model.</p>
+  <div class="post-content" itemprop="articleBody">
+    <p>I’ve started getting back into serverless engineering recently and decided to give <a href="https://netlify.com">Netlify</a> a try. I appreciate their focus on JAMStack and the availability of server-side functions that integrate fairly well into my local dev model.</p>
 
 <p>One of the first tasks I tackled was integrating authentication with my backend. Netlify provides an Identity service which handles registration, confirmation, and log in. It also supports custom metadata which I wanted to use to tie the DB-side ID with the netlify identity but ran into problems. I tried to use <a href="https://docs.netlify.com/functions/functions-and-identity/">Netlify’s built-in identity hooks</a> but wasn’t able to update metadata as they describe so I created a custom solution.</p>
 
@@ -214,191 +172,100 @@
 <span class="k">export</span> <span class="p">{</span> <span class="nx">signUp</span> <span class="k">as</span> <span class="nx">handler</span> <span class="p">};</span>
 </code></pre></div></div>
 
-        </p>
-      </li>
-    
-      <li>
-        <span class="post-meta">Sep 26, 2020</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2020/09/26/react-hook-migration-strategy.html">React Hook Migration Strategy</a>
-        </h2>
-        <p>
-        
-
-        </p>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jul 7, 2019</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2019/07/07/rust-wasm-seeding-the-game-of-life.html">Rust + WASM: Seeding the Game of Life</a>
-        </h2>
-        <p>
-        <p>After getting a <a href="/blog/2019/07/04/rust-wasm-getting-started.html">basic game of life running in Rust + WASM</a>, I wanted to expand it a bit further to
-allow seeding the initial state. Initially, I planned to allow an array of flags
-to seed any value but decided instead to use strings instead. It proved to be a
-bit more difficult but also more interesting.</p>
-
-
-        </p>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jul 4, 2019</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2019/07/04/rust-wasm-getting-started.html">Rust + WASM: Getting Started</a>
-        </h2>
-        <p>
-        <p>I’ve been curious about the UI framework engineering opportunities of a minimal UI engine built in Rust and compiled into WASM. I’m going to document my journey here!</p>
-
-
-        </p>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 30, 2019</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2019/06/30/what-makes-a-good-pull-request.html">What Makes a Good Pull Request?</a>
-        </h2>
-        <p>
-        <p>I get to spend a lot of time reviewing other engineers’ code. Over time, I’ve
-found that it has helped me become a better engineer as I learned new techniques
-to solve problems, explored parts of the code base that I haven’t worked in
-before, and improved my ability to communicate effectively to others.</p>
-
-<p>Through the course of my reviews, I’ve seen some common practices that I feel
-make for good pull requests. Some may be obvious but others are a bit more
-subtle.</p>
-
-
-        </p>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 24, 2019</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2019/06/24/consolidating-my-content.html">Consolidating my content</a>
-        </h2>
-        <p>
-        <p>I decided this past week or so to try to resurrect my writing by fleshing out a <a href="/blog/2019/06/16/weekly-releases.html">post of weekly releases</a>. That gave me just enoough momentum to also migrate content from my long forgotten <a href="https://ryanjduffy.tumblr.com">Tumblr</a>, <a href="https://medium.com/@theryanjduffy">Medium</a>, and <a href="https://www.codementor.io/ryan286/posts">Code Mentor</a> accounts.</p>
-
-<p>While each service has their place and provide a community of content, I wanted to own my own content and be in more control of its availability. I might still cross-post to those places but intend to use this site sourced from <a href="https://github.com/ryanjduffy/blog">GitHub</a> as the home for new content.</p>
-
-        </p>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jun 16, 2019</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2019/06/16/weekly-releases.html">Weekly Releases</a>
-        </h2>
-        <p>
-        <p>We’ve recently got back into the habit of weekly releases in preparation for a 3.0.0 release of <a href="https://www.enactjs.com/">Enact</a> and it has reminded how useful they are. They add some much needed structure and predictability which help us ship a consistently high quality product.</p>
-
-
-        </p>
-      </li>
-    
-      <li>
-        <span class="post-meta">Nov 7, 2017</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2017/11/07/git-alias-merge-conflicts.html">Git Alias: Merge Conflicts</a>
-        </h2>
-        <p>
-        <blockquote>
-  <p>Originally posted on Code Mentor: https://www.codementor.io/ryan286/git-alias-merge-conflicts-dmkcw8r3p</p>
-</blockquote>
-
-<p>Like many engineers, I spend a lot of time working with <code class="language-plaintext highlighter-rouge">git</code>. It’s an incredibly powerful tool with more options than most people ever need. If you work in the CLI like I do, you’ve probably added a few aliases to help make you more productive. Today, I added a new one to list merge conflicts.</p>
-
-
-        </p>
-      </li>
-    
-      <li>
-        <span class="post-meta">Oct 5, 2017</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2017/10/05/working-with-react-context.html">Working with React Context</a>
-        </h2>
-        <p>
-        <blockquote>
-  <p>Originally published on Code Mentor: https://www.codementor.io/ryan286/working-with-react-context-9vgn0gdof</p>
-</blockquote>
-
-<p>One of the most important concepts of React is unidirectional data flow. Data enters the system at one point and flows downstream with each component filtering and augmenting that data for its children. This is an incredibly simple but also very powerful paradigm that enables you to build complex systems with simple data flows.</p>
-
-
-        </p>
-      </li>
-    
-      <li>
-        <span class="post-meta">Jul 10, 2017</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2017/07/10/passing-functions-as-react-props.html">Passing Functions as React Props</a>
-        </h2>
-        <p>
-        <blockquote>
-  <p>Originally posted on Code Mentor: https://www.codementor.io/ryan286/passing-functions-as-react-props-9fimj8ikv</p>
-</blockquote>
-
-<p>I recently had a discussion with a coworker about the naming of a function property that will be passed to a React component. It got me thinking more thoroughly about the role of functions as properties. I find that they usually fall into one of two camps. The function either:</p>
-
-<ul>
-  <li>Notifies the container of user or component action, or</li>
-  <li>Provides some capability that the component needs.</li>
-</ul>
-
-
-        </p>
-      </li>
-    
-  </ul>
-
-  
-  
-  <div class="pagination">
-    
-      <span>&laquo; Prev</span>
-    
-
-    
-      
-        <em>1</em>
-      
-    
-      
-        <a href="/blog/page2">2</a>
-      
-    
-      
-        <a href="/blog/page3">3</a>
-      
-    
-      
-        <a href="/blog/page4">4</a>
-      
-    
-      
-        <a href="/blog/page5">5</a>
-      
-    
-
-    
-      <a href="/blog/page2">Next &raquo;</a>
-    
   </div>
-  
+  <style type="text/css">
+.post-history {
+	margin-bottom: 10px;
+}
+
+.post-history h3 {
+	margin: 0 0 10px 0;
+}
+
+.history-entry {
+	border: 1px solid #ccc;
+	border-bottom-width: 0px;
+	padding: 10px 10px 10px 60px;
+	font-size: 0.8em;
+}
+
+.history-entry:first-of-type {
+	border-top-left-radius: 3px;
+	border-top-right-radius: 3px;
+}
+
+.history-entry:last-of-type {
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+	border-bottom-width: 1px;
+}
+
+.history-entry IMG {
+	height: 40px;
+	width: 40px;
+	border-radius: 50%;
+	float: left;
+	margin-left: -50px;
+}
+
+.history-entry a {
+	display: block;
+	color: #000;
+	font-weight: bold;
+}
+</style>
+<div id="post_history" class="post-history" style="display: none">
+	<h3>Revisions</h3>
 
 </div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.11.0/moment.min.js"></script>
+<script>
+(function () {
+	var url = 'https://api.github.com/repos/ryanjduffy/blog/commits?path=_posts/2021-01-04-custom-sign-up-handler-for-netlify.md',
+		xhr = new XMLHttpRequest();
+
+	// from http://stackoverflow.com/questions/1219860/html-encoding-in-javascript-jquery
+	function htmlEscape(str) {
+		return String(str)
+			.replace(/&/g, '&amp;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;');
+	}
+
+	xhr.open('GET', url);
+	xhr.send();
+	xhr.onreadystatechange = function () {
+		var commits, html,
+			post_history = document.getElementById('post_history');
+		if (xhr.readyState !== 4 || xhr.status !== 200) return;
+
+		commits = JSON.parse(xhr.responseText);
+		if (commits && commits.length) {
+			html = commits.map(function (commit) {
+				var author = htmlEscape(commit.commit.author.name),
+					avatar = commit.author.avatar_url,
+					date = moment(new Date(commit.commit.author.date)).fromNow(),
+					message = htmlEscape(commit.commit.message.split('\n')[0]),
+					url = commit.html_url;
+				
+				return '<div class="history-entry">' +
+							'<img src="' + avatar + '">' +
+							'<a href="' + url + '" target="gh-history">' + message + '</a>' +
+							'<span>' + author + ' updated this ' + date.toLocaleString() + '</span>' + 
+						'</div>';
+			}).join('');
+
+			post_history.innerHTML += html;
+			post_history.style.display = 'block';
+		}
+	};
+})();
+</script>
+  
+
+</article>
 
       </div>
     </div>

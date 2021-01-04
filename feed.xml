@@ -6,8 +6,8 @@
 </description>
     <link>https://ryanjduffy.github.io/blog/</link>
     <atom:link href="ryanjduffy.github.io/blog/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 04 Jan 2021 14:43:25 -0800</pubDate>
-    <lastBuildDate>Mon, 04 Jan 2021 14:43:25 -0800</lastBuildDate>
+    <pubDate>Mon, 04 Jan 2021 14:45:51 -0800</pubDate>
+    <lastBuildDate>Mon, 04 Jan 2021 14:45:51 -0800</lastBuildDate>
     <generator>Jekyll v4.1.1</generator>
     
       <item>
@@ -15,6 +15,8 @@
         <description>&lt;p&gt;I’ve started getting back into serverless engineering recently and decided to give &lt;a href=&quot;https://netlify.com&quot;&gt;Netlify&lt;/a&gt; a try. I appreciate their focus on JAMStack and the availability of server-side functions that integrate fairly well into my local dev model.&lt;/p&gt;
 
 &lt;p&gt;One of the first tasks I tackled was integrating authentication with my backend. Netlify provides an Identity service which handles registration, confirmation, and log in. It also supports custom metadata which I wanted to use to tie the DB-side ID with the netlify identity but ran into problems. I tried to use &lt;a href=&quot;https://docs.netlify.com/functions/functions-and-identity/&quot;&gt;Netlify’s built-in identity hooks&lt;/a&gt; but wasn’t able to update metadata as they describe so I created a custom solution.&lt;/p&gt;
+
+&lt;!--more--&gt;
 
 &lt;h2 id=&quot;creating-the-sign-up-form&quot;&gt;Creating the Sign Up Form&lt;/h2&gt;
 

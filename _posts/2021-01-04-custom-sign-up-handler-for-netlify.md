@@ -9,6 +9,8 @@ I've started getting back into serverless engineering recently and decided to gi
 
 One of the first tasks I tackled was integrating authentication with my backend. Netlify provides an Identity service which handles registration, confirmation, and log in. It also supports custom metadata which I wanted to use to tie the DB-side ID with the netlify identity but ran into problems. I tried to use [Netlify's built-in identity hooks](https://docs.netlify.com/functions/functions-and-identity/) but wasn't able to update metadata as they describe so I created a custom solution.
 
+<!--more-->
+
 ## Creating the Sign Up Form
 
 Netlify provides a couple of drop-in libraries but I needed to create a form to trigger my custom logic. Here's the simplified version. The notable entries are the form `action` and the hidden `to` field. The `action` is my custom sign-up function and the `to` field configures the HTTP redirect after the sign-up completes.

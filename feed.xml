@@ -6,8 +6,8 @@
 </description>
     <link>https://ryanjduffy.github.io/blog/</link>
     <atom:link href="ryanjduffy.github.io/blog/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 31 Jan 2021 14:15:48 -0800</pubDate>
-    <lastBuildDate>Sun, 31 Jan 2021 14:15:48 -0800</lastBuildDate>
+    <pubDate>Sun, 31 Jan 2021 14:17:15 -0800</pubDate>
+    <lastBuildDate>Sun, 31 Jan 2021 14:17:15 -0800</lastBuildDate>
     <generator>Jekyll v4.2.0</generator>
     
       <item>
@@ -45,23 +45,23 @@
 &lt;p&gt;Example&lt;/p&gt;
 
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Call(
-  Function('addToData'),
-  [
-    Get(Ref(Collection(&quot;users&quot;), &quot;288896729057591808&quot;)),
-    {
-      stuff: 'okay'
-    }
-  ]
+	Function('addToData'),
+	[
+		Get(Ref(Collection(&quot;users&quot;), &quot;288896729057591808&quot;)),
+		{
+			stuff: 'okay'
+		}
+	]
 )
 
 &amp;gt;&amp;gt; results
 
 {
 	ref: Ref(Collection(&quot;users&quot;), &quot;288896729057591808&quot;),
-    ts: 1611772240815000,
-    data: {
-      name: &quot;Ryan Duffy&quot;,
-      stuff: &quot;okay&quot;
+	ts: 1611772240815000,
+	data: {
+		name: &quot;Ryan Duffy&quot;,
+		stuff: &quot;okay&quot;
 	}
 }
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;

@@ -103,23 +103,23 @@
 <p>Example</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Call(
-  Function('addToData'),
-  [
-    Get(Ref(Collection("users"), "288896729057591808")),
-    {
-      stuff: 'okay'
-    }
-  ]
+	Function('addToData'),
+	[
+		Get(Ref(Collection("users"), "288896729057591808")),
+		{
+			stuff: 'okay'
+		}
+	]
 )
 
 &gt;&gt; results
 
 {
 	ref: Ref(Collection("users"), "288896729057591808"),
-    ts: 1611772240815000,
-    data: {
-      name: "Ryan Duffy",
-      stuff: "okay"
+	ts: 1611772240815000,
+	data: {
+		name: "Ryan Duffy",
+		stuff: "okay"
 	}
 }
 </code></pre></div></div>

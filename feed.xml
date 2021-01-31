@@ -6,13 +6,13 @@
 </description>
     <link>https://ryanjduffy.github.io/blog/</link>
     <atom:link href="ryanjduffy.github.io/blog/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 31 Jan 2021 14:19:09 -0800</pubDate>
-    <lastBuildDate>Sun, 31 Jan 2021 14:19:09 -0800</lastBuildDate>
+    <pubDate>Sun, 31 Jan 2021 14:20:53 -0800</pubDate>
+    <lastBuildDate>Sun, 31 Jan 2021 14:20:53 -0800</lastBuildDate>
     <generator>Jekyll v4.2.0</generator>
     
       <item>
         <title>Appending data to a document in Fauna</title>
-        <description>&lt;p&gt;I’ve been diving into (faunadb)[https://fauna.com/] recently. I found it via its integration with (Netlify)[https://netlify.com/] and its GraphQL support. But, this isn’t about either of those things!&lt;/p&gt;
+        <description>&lt;p&gt;I’ve been diving into &lt;a href=&quot;https://fauna.com/&quot;&gt;faunadb&lt;/a&gt; recently. I found it via its integration with &lt;a href=&quot;https://netlify.com/&quot;&gt;Netlify&lt;/a&gt; and its GraphQL support. But, this isn’t about either of those things!&lt;/p&gt;
 
 &lt;p&gt;One feature I’ve enjoyed with fauna is its support for &lt;a href=&quot;https://docs.fauna.com/fauna/current/api/fql/functions&quot;&gt;User-defined Functions (UDFs)&lt;/a&gt;. I used to created stored procedures in my relational DB past and like being able to consolidate data-related logic on the database to keep that logic centralize and reduce round-trips from the service tier.&lt;/p&gt;
 

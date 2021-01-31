@@ -118,53 +118,6 @@
 
 <p>I’ve been building some custom functions to use as GraphQL endpoints to present a consistent, managed view of the data for my service tier / front-end. To support this, I created a quick utility UDF that merges an arbitrary object into the <code class="language-plaintext highlighter-rouge">data</code> payload of a document.</p>
 
-<p>The function, <code class="language-plaintext highlighter-rouge">addToData</code>, accepts a target object, <code class="language-plaintext highlighter-rouge">into</code>, and an object of additional data, <code class="language-plaintext highlighter-rouge">data</code>. The contents of the <code class="language-plaintext highlighter-rouge">data</code> variable is merged into the <code class="language-plaintext highlighter-rouge">data</code> key of the <code class="language-plaintext highlighter-rouge">into</code> object to produce the output. If I need to add a computed value to a document, this is a quick way to add that in a consistent manner.</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>CreateFunction({
-	name: 'addToData',
-	body: Query(
-		Lambda(
-			["into", "data"],
-			Merge(
-				Var("into"),
-				{data: Var("data")},
-				Lambda(
-					["key", "a", "b"],
-					If(
-						Equals(Var("key"), "data"),
-						Merge(Var("a"), Var("b")),
-						Var("a")
-					)
-				)
-			)
-		)
-	)
-})
-</code></pre></div></div>
-
-<p>Example</p>
-
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Call(
-	Function('addToData'),
-	[
-		Get(Ref(Collection("users"), "288896729057591808")),
-		{
-			stuff: 'okay'
-		}
-	]
-)
-
-&gt;&gt; results
-
-{
-	ref: Ref(Collection("users"), "288896729057591808"),
-	ts: 1611772240815000,
-	data: {
-		name: "Ryan Duffy",
-		stuff: "okay"
-	}
-}
-</code></pre></div></div>
 
         </p>
       </li>

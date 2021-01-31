@@ -6,8 +6,8 @@
 </description>
     <link>https://ryanjduffy.github.io/blog/</link>
     <atom:link href="ryanjduffy.github.io/blog/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 31 Jan 2021 14:17:15 -0800</pubDate>
-    <lastBuildDate>Sun, 31 Jan 2021 14:17:15 -0800</lastBuildDate>
+    <pubDate>Sun, 31 Jan 2021 14:19:09 -0800</pubDate>
+    <lastBuildDate>Sun, 31 Jan 2021 14:19:09 -0800</lastBuildDate>
     <generator>Jekyll v4.2.0</generator>
     
       <item>
@@ -17,6 +17,8 @@
 &lt;p&gt;One feature I’ve enjoyed with fauna is its support for &lt;a href=&quot;https://docs.fauna.com/fauna/current/api/fql/functions&quot;&gt;User-defined Functions (UDFs)&lt;/a&gt;. I used to created stored procedures in my relational DB past and like being able to consolidate data-related logic on the database to keep that logic centralize and reduce round-trips from the service tier.&lt;/p&gt;
 
 &lt;p&gt;I’ve been building some custom functions to use as GraphQL endpoints to present a consistent, managed view of the data for my service tier / front-end. To support this, I created a quick utility UDF that merges an arbitrary object into the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;data&lt;/code&gt; payload of a document.&lt;/p&gt;
+
+&lt;!--more--&gt;
 
 &lt;p&gt;The function, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;addToData&lt;/code&gt;, accepts a target object, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;into&lt;/code&gt;, and an object of additional data, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;data&lt;/code&gt;. The contents of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;data&lt;/code&gt; variable is merged into the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;data&lt;/code&gt; key of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;into&lt;/code&gt; object to produce the output. If I need to add a computed value to a document, this is a quick way to add that in a consistent manner.&lt;/p&gt;
 

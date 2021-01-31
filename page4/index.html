@@ -108,6 +108,29 @@
   <ul class="post-list">
     
       <li>
+        <span class="post-meta">Oct 14, 2011</span>
+
+        <h2>
+          <a class="post-link" href="/blog/2011/10/14/enyo-daily-18-dynamic-depends-js.html">Enyo Daily #18 - Dynamic depends.js </a>
+        </h2>
+        <p>
+        <p><p><em>While it's probably not fair to call this "daily" any longer, I'm going to stick with it anyway.</em></p>
+<p>You may have heard that <a href="http://www.precentral.net/bing-maps-update-brings-enyo-support-webos-masses">enyo has found its way onto the legacy</a> devices via a <a href="http://blog.palm.com/palm/2011/10/a-new-view-of-the-world.html">new Maps application</a> in the App Catalog.  To test things out, I tried to deploy <a href="http://bit.ly/scorekeeper">Score Keeper</a> onto my Pre2.  It deploys successfully but there are definitely some bugs to sort out.  One way I intend to clean up the UI is by including a phone-specific stylesheet through a dynamic depends.js file.</p>
+[[MORE]]
+<p>The normal depends.js file looks something like this:</p>
+<blockquote>
+<p>enyo.depends(<br />    "controls.js",<br />    "app.js",<br />    "app.css"<br />);</p>
+</blockquote>
+<p>This tells enyo to load up controls.js, app.js, and app.css in the same directory as this depends.js file.  But depends.js is just a regular javascript file so there's nothing preventing you from doing something a little more robust here to select which files you want to include.  Also, since the framework is the one including depends.js in the first place, all the framework functions are available during execution of depends.js.</p>
+<p>I elected to use a closure to keep the global namespace clear and base my custom CSS inclusion on the screen width.  If you're aware of a better condition to check, please share in the comments.  Inside the function, I retrieve the device info and build an array of the common files.  Next, I check the device width and push the extra css if appropriate.  Finally, I call enyo.depends (via Function.apply since I'm working with an array) and that's all!</p>
+<blockquote>
+<p>(function() {<br />    var di = enyo.fetchDeviceInfo();<br />    <br />    var paths = ["extras.js",<br />                 "views.js",<br />                 "app.css"];<br />    <br />    if(di &amp;&amp; di.screenWidth &lt; 500) {<br />        paths.push("app-phone.css");<br />    }<br />    <br />    enyo.depends.apply(enyo, paths);<br />})();</p>
+</blockquote></p>
+
+        </p>
+      </li>
+    
+      <li>
         <span class="post-meta">Sep 19, 2011</span>
 
         <h2>
@@ -327,30 +350,6 @@
 <p>&lt;!doctype html&gt;<br />&lt;html&gt;<br />&lt;head&gt;<br />    &lt;title&gt;Dashboard&lt;/title&gt;<br />    &lt;script src="/dev/enyo/1.0/framework/enyo.js" type="text/javascript"&gt;&lt;/script&gt;<br />&lt;/head&gt;<br />&lt;body&gt;<br />&lt;script type="text/javascript"&gt;<br />    (function () {<br />        var i = 0, d = enyo.create({kind:"Dashboard", name:"counter"});<br />        d.clickHandler = function() {<br />            d.setLayers([{title:"Click Count",text:"I've been clicked " + (i++) + " times"}]);<br />        }<br />        d.clickHandler();<br />    })();<br />&lt;/script&gt;<br />&lt;/body&gt;<br />&lt;/html&gt;</p>
 </blockquote>
 <p>If you try this at home, be sure to add "noWindow":true to your appinfo.json.</p>
-
-        </p>
-      </li>
-    
-      <li>
-        <span class="post-meta">Aug 2, 2011</span>
-
-        <h2>
-          <a class="post-link" href="/blog/2011/08/02/enyo-daily-9-stateful.html">Enyo Daily #9 - Stateful</a>
-        </h2>
-        <p>
-        <p><p>I came across this interesting kind while investigating the Picker control.  It's pretty basic -- 1 property and 1 method (+1 protected) -- but can be a useful base class to streamline the styling of a control.</p>
-[[MORE]]
-<p>Stateful's single method is setState() which expects attribute as a string and its state as a boolean.  This method in turn adds or removes a css class with the attribute name as the suffix.  The prefix for the class name is set using the single published property of Stateful -- cssNamespace.  The default cssNamespace is "enyo" but I'd recommend changing it to something unique to your application.</p>
-<p>While you could create a Stateful kind directly, it's designed to be used as a base class.  For example, CustomButton (which is one of the base kinds for the Picker control), publishes several additional properties; each of the changed handlers for these properties call Stateful.setState to style the control appropriate for the change in property value.</p>
-<p>An example will help illustrate.  For a further example, take a look at the source for CustomButton.</p>
-<p><strong>CSS</strong></p>
-<blockquote>
-<p>.extras-active {<br />  background-color:red;<br />}</p>
-</blockquote>
-<p><strong>JavaScript</strong></p>
-<blockquote>
-<p>enyo.kind({<br />  name:"StatefulButton",<br />  kind:"Stateful",<br />  cssNamespace:"extras",<br />  published:{<br />    active:false<br />  },<br />  activeChanged:function() {<br />    this.setState("active", this.active);<br />  },<br />  clickHandler:function() {<br />      this.setActive(!this.active);<br />  }<br />});<br /><br />enyo.kind({<br />  name:"com.technisode.example.App",<br />  kind:"VFlexBox",<br />  components:[<br />    {kind:"StatefulButton", active:true, content:"Button 1"},<br />    {kind:"StatefulButton", active:false, content:"Button 2"},<br />    {kind:"StatefulButton", active:false, content:"Button 3"}<br />  ]<br />});</p>
-</blockquote></p>
 
         </p>
       </li>

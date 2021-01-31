@@ -6,9 +6,74 @@
 </description>
     <link>https://ryanjduffy.github.io/blog/</link>
     <atom:link href="ryanjduffy.github.io/blog/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 04 Jan 2021 14:45:51 -0800</pubDate>
-    <lastBuildDate>Mon, 04 Jan 2021 14:45:51 -0800</lastBuildDate>
-    <generator>Jekyll v4.1.1</generator>
+    <pubDate>Sun, 31 Jan 2021 14:15:48 -0800</pubDate>
+    <lastBuildDate>Sun, 31 Jan 2021 14:15:48 -0800</lastBuildDate>
+    <generator>Jekyll v4.2.0</generator>
+    
+      <item>
+        <title>Appending data to a document in Fauna</title>
+        <description>&lt;p&gt;I’ve been diving into (faunadb)[https://fauna.com/] recently. I found it via its integration with (Netlify)[https://netlify.com/] and its GraphQL support. But, this isn’t about either of those things!&lt;/p&gt;
+
+&lt;p&gt;One feature I’ve enjoyed with fauna is its support for &lt;a href=&quot;https://docs.fauna.com/fauna/current/api/fql/functions&quot;&gt;User-defined Functions (UDFs)&lt;/a&gt;. I used to created stored procedures in my relational DB past and like being able to consolidate data-related logic on the database to keep that logic centralize and reduce round-trips from the service tier.&lt;/p&gt;
+
+&lt;p&gt;I’ve been building some custom functions to use as GraphQL endpoints to present a consistent, managed view of the data for my service tier / front-end. To support this, I created a quick utility UDF that merges an arbitrary object into the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;data&lt;/code&gt; payload of a document.&lt;/p&gt;
+
+&lt;p&gt;The function, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;addToData&lt;/code&gt;, accepts a target object, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;into&lt;/code&gt;, and an object of additional data, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;data&lt;/code&gt;. The contents of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;data&lt;/code&gt; variable is merged into the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;data&lt;/code&gt; key of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;into&lt;/code&gt; object to produce the output. If I need to add a computed value to a document, this is a quick way to add that in a consistent manner.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;CreateFunction({
+	name: 'addToData',
+	body: Query(
+		Lambda(
+			[&quot;into&quot;, &quot;data&quot;],
+			Merge(
+				Var(&quot;into&quot;),
+				{data: Var(&quot;data&quot;)},
+				Lambda(
+					[&quot;key&quot;, &quot;a&quot;, &quot;b&quot;],
+					If(
+						Equals(Var(&quot;key&quot;), &quot;data&quot;),
+						Merge(Var(&quot;a&quot;), Var(&quot;b&quot;)),
+						Var(&quot;a&quot;)
+					)
+				)
+			)
+		)
+	)
+})
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Example&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Call(
+  Function('addToData'),
+  [
+    Get(Ref(Collection(&quot;users&quot;), &quot;288896729057591808&quot;)),
+    {
+      stuff: 'okay'
+    }
+  ]
+)
+
+&amp;gt;&amp;gt; results
+
+{
+	ref: Ref(Collection(&quot;users&quot;), &quot;288896729057591808&quot;),
+    ts: 1611772240815000,
+    data: {
+      name: &quot;Ryan Duffy&quot;,
+      stuff: &quot;okay&quot;
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</description>
+        <pubDate>Sun, 31 Jan 2021 13:57:00 -0800</pubDate>
+        <link>https://ryanjduffy.github.io/blog/2021/01/31/appending-data-to-a-document-in-fauna.html</link>
+        <guid isPermaLink="true">https://ryanjduffy.github.io/blog/2021/01/31/appending-data-to-a-document-in-fauna.html</guid>
+        
+        <category>faunadb</category>
+        
+        
+      </item>
     
       <item>
         <title>Custom Sign Up Handler for Netlify</title>
@@ -1124,113 +1189,6 @@ const App = (props) =&amp;gt; (
         <pubDate>Thu, 05 Oct 2017 20:33:00 -0700</pubDate>
         <link>https://ryanjduffy.github.io/blog/2017/10/05/working-with-react-context.html</link>
         <guid isPermaLink="true">https://ryanjduffy.github.io/blog/2017/10/05/working-with-react-context.html</guid>
-        
-        
-      </item>
-    
-      <item>
-        <title>Passing Functions as React Props</title>
-        <description>&lt;blockquote&gt;
-  &lt;p&gt;Originally posted on Code Mentor: https://www.codementor.io/ryan286/passing-functions-as-react-props-9fimj8ikv&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;I recently had a discussion with a coworker about the naming of a function property that will be passed to a React component. It got me thinking more thoroughly about the role of functions as properties. I find that they usually fall into one of two camps. The function either:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Notifies the container of user or component action, or&lt;/li&gt;
-  &lt;li&gt;Provides some capability that the component needs.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;!--more--&gt;
-
-&lt;h2 id=&quot;event-callbacks&quot;&gt;Event Callbacks&lt;/h2&gt;
-
-&lt;p&gt;Let’s call the first an “Event Callback.” This lines up well with the native event hooks provided by React. You, the component author, can provide a function (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;this.handleClick&lt;/code&gt;) via the prop (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;onClick&lt;/code&gt;) of your &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&amp;lt;button&amp;gt;&lt;/code&gt; component like so:&lt;/p&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;MyComponent&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;React&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Component&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;handleClick&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ev&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ev&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;keyCode&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;===&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;13&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;Enter!&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    
-    &lt;span class=&quot;nx&quot;&gt;render&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
-            &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;button&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;onClick&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;handleClick&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;
-            	&lt;span class=&quot;nx&quot;&gt;Click&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;it&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;real&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;good&lt;/span&gt;
-            &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/button&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;gt;
-&lt;/span&gt;        &lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;If &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&amp;lt;button&amp;gt;&lt;/code&gt; was a “regular” React component, you might expect it to have a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;propType&lt;/code&gt; defined that will declare that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;onClick&lt;/code&gt; expect a function.&lt;/p&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nx&quot;&gt;onClick&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;PropTypes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;func&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;What this means, intuitively, is that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;&amp;lt;button&amp;gt;&lt;/code&gt; accepts a function in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;onClick&lt;/code&gt; prop, which will be called when the button is clicked. It doesn’t, however, imply what it “means” to click the button. Does it submit a form? select an option? play a &lt;a href=&quot;https://twitter.com/sarahjorden_/status/877005793492692992&quot;&gt;ninja cat video&lt;/a&gt;? That responsibility lies within the &lt;strong&gt;container&lt;/strong&gt; and is the defining characteristic of an Event Callback:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;With an Event Callback, a component is responsible for notifying the container that a user or component action has occurred, but not what the result of that action should be.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;dependency-injection&quot;&gt;Dependency Injection&lt;/h2&gt;
-
-&lt;p&gt;Sometimes, a component either requires a feature be implemented by its container or allows for its container to override a feature’s default behavior.&lt;/p&gt;
-
-&lt;p&gt;An example of this comes from the popular &lt;a href=&quot;https://www.npmjs.com/package/react-router&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;react-router&lt;/code&gt;&lt;/a&gt; package.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://reacttraining.com/react-router/web/api/NavLink/isActive-func&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NavLink#isActive&lt;/code&gt;&lt;/a&gt; accepts a function as a prop, which is used by the component to override the default behavior of marking a link active if it matches the current URL’s pathname.&lt;/p&gt;
-
-&lt;p&gt;Here’s an example lifted directly from the package docs:x`&lt;/p&gt;
-
-&lt;div class=&quot;language-js highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;// only consider an event active if its event id is an odd number&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;oddEvent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;match&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;location&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;match&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;eventID&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;parseInt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;match&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;eventID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;isNaN&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;eventID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;eventID&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;===&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;NavLink&lt;/span&gt;
-  &lt;span class=&quot;nx&quot;&gt;to&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/events/123&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;
-  &lt;span class=&quot;nx&quot;&gt;isActive&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;oddEvent&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Event&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;123&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;sr&quot;&gt;/NavLink&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;&amp;gt;
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;In this example, the container doesn’t need to be notified of anything; instead, it is injecting a new, custom behavior.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;With Dependency Injection, the component is responsible for describing the contract for the feature (via the function’s interface). The container will provide the feature.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;implementation-differences&quot;&gt;Implementation Differences&lt;/h2&gt;
-
-&lt;p&gt;A consistent API makes for a predictable API, which improves the overall developer experience. Below are a few implementation best practices for each type of function that leads to consistent components and happy consumers!&lt;/p&gt;
-
-&lt;p&gt;Event Callbacks should be:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Optional:&lt;/strong&gt; There are exceptions, but normally should be at the discretion of the consumer to handle an event&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Named consistently:&lt;/strong&gt; Prefix all event callbacks with &lt;em&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;on&lt;/code&gt;&lt;/em&gt;, e.g. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;onSelectThing&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Single argument:&lt;/strong&gt; Pass an object argument with relevant data for the event, e.g. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;onSelectThing({index: 1})&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Unidirectional:&lt;/strong&gt; Only pass data via the callback and not rely on a return value from the callback&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Dependency Injection functions should be:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Unidirectional:&lt;/strong&gt; Only pass behavior into a component and not expect feedback from the function (or its parameters!)&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Named appropriately:&lt;/strong&gt; often beginning with a verb, e.g. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;isActive&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;generateId&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;wrap-up&quot;&gt;Wrap Up&lt;/h2&gt;
-
-&lt;p&gt;Hopefully this post helps you make consistent decisions when accepting functions as a prop to your React components. Have you encountered other use cases for functions as props? Do you disagree with the best practices above or have other recommendations? Please comment below :)&lt;/p&gt;
-</description>
-        <pubDate>Mon, 10 Jul 2017 20:47:00 -0700</pubDate>
-        <link>https://ryanjduffy.github.io/blog/2017/07/10/passing-functions-as-react-props.html</link>
-        <guid isPermaLink="true">https://ryanjduffy.github.io/blog/2017/07/10/passing-functions-as-react-props.html</guid>
         
         
       </item>
